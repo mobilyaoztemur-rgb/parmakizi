@@ -8,6 +8,7 @@ import ipaddress
 import json
 from pathlib import Path
 import queue
+import secrets
 import socket
 import subprocess
 import sys
@@ -19,7 +20,7 @@ import uuid
 
 from gateway.client import CloudClient, ApiError
 from gateway.connector import Connector, networks
-from gateway.storage import load_settings, save_settings
+from gateway.storage import load_settings, save_settings, dpapi
 
 TYPES = {"device.info": "Cihaz bilgisi", "users.read": "Personel oku", "attendance.read": "Geçişleri oku", "users.upsert": "Personel yaz", "discover": "Ağ keşfi"}
 STATES = {"queued": "Bekliyor", "running": "Çalışıyor", "succeeded": "Tamamlandı", "failed": "Başarısız", "uncertain": "Cihazdan kontrol edin"}
@@ -524,7 +525,46 @@ class App:
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--allow-insecure-local", action="store_true")
+    parser.add_argument('--self-test-report', help=argparse.SUPPRESS)
     args = parser.parse_args()
+    if args.self_test_report:
+        report = {'ok': False}
+        app = None
+        try:
+            root = tk.Tk()
+            root.withdraw()
+            app = App(root)
+            root.update_idletasks()
+            report['window_title'] = root.title()
+            endpoint = default_url()
+            if not endpoint:
+                raise ValueError('Packaged default endpoint missing')
+            report['default_endpoint'] = endpoint
+            client = CloudClient(endpoint)
+            report['health'] = client.request('/api/health')
+            if report['health'].get('ok') is not True:
+                raise ValueError('Cloud health failed')
+            try:
+                client.request('/api/overview')
+            except ApiError as error:
+                report['anonymous_http_status'] = error.status
+                if error.status != 401:
+                    raise
+            else:
+                raise ValueError('Anonymous cloud access was not rejected')
+            if sys.platform == 'win32':
+                sample = secrets.token_bytes(24)
+                report['windows_dpapi'] = dpapi(dpapi(sample), decrypt=True) == sample
+                if not report['windows_dpapi']:
+                    raise ValueError('Windows credential protection failed')
+            report['ok'] = True
+        except Exception as error:
+            report['error_type'] = type(error).__name__
+        finally:
+            if app:
+                app.close()
+            Path(args.self_test_report).write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding='utf-8')
+        raise SystemExit(0 if report['ok'] else 1)
     root = tk.Tk()
     App(root, args.allow_insecure_local)
     root.mainloop()

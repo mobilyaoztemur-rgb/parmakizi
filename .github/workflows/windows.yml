@@ -41,6 +41,21 @@ jobs:
         run: |
           $hash = (Get-FileHash dist/Parmakizi.exe -Algorithm SHA256).Hash.ToLower()
           "$hash  Parmakizi.exe" | Set-Content -Encoding ascii dist/Parmakizi.exe.sha256
+      - name: Verify the packaged EXE opens and reaches the live API
+        shell: pwsh
+        run: |
+          $report = Join-Path (Get-Location) 'dist/self-test.json'
+          $app = Start-Process -FilePath dist/Parmakizi.exe -ArgumentList @('--self-test-report', ('"{0}"' -f $report)) -PassThru
+          if (-not $app.WaitForExit(90000)) {
+            Stop-Process -Id $app.Id -Force
+            throw 'Packaged EXE smoke test timed out'
+          }
+          if ($app.ExitCode -ne 0) { throw 'Packaged EXE smoke test failed' }
+          $result = Get-Content $report -Raw | ConvertFrom-Json
+          if (-not $result.ok -or -not $result.windows_dpapi -or $result.anonymous_http_status -ne 401) {
+            throw 'Packaged EXE did not verify its UI, cloud connection and credential protection'
+          }
+          Write-Output 'Packaged Windows EXE: UI startup, HTTPS API, anonymous access rejection and DPAPI passed.'
       - name: Include source and notices with the internal build
         shell: pwsh
         run: |
@@ -53,6 +68,7 @@ jobs:
           path: |
             dist/Parmakizi.exe
             dist/Parmakizi.exe.sha256
+            dist/self-test.json
             dist/Parmakizi-source.zip
             dist/THIRD_PARTY_NOTICES.md
             dist/licenses/

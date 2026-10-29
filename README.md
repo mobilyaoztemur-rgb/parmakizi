@@ -92,6 +92,8 @@ Bu kurulumda `parmakizi` D1 veritabanı ve `https://parmakizi.mobilyaoztemur.wor
 
 `Windows EXE` workflow'u `main` üzerindeki masaüstü değişikliklerinde, `v*` etiketlerinde veya elle çalıştırıldığında Windows runner üzerinde Python ve Tkinter dahil bağımsız `Parmakizi.exe` üretir. Actions çalıştırmasının **Artifacts → Parmakizi-Windows-x64** paketini indirin. EXE dijital olarak imzalanmamıştır; yayımlama için kod imzalama sertifikası ayrıca gerekir. SHA-256 dosyası aynı pakettedir.
 
+Derlenen EXE, paketlenmiş haliyle Windows runner üzerinde ayrıca başlatılır. Pencere kurulumu, içindeki varsayılan adresle canlı HTTPS API bağlantısı, kimliksiz erişimin reddi ve DPAPI şifreleme/çözme kontrol edilir. Gizli değer içermeyen sonuç `self-test.json` olarak pakete eklenir. Bu kontrol fiziksel cihaz uyumluluğunu doğrulamaz.
+
 ZK adaptörünün `pyzk` bağımlılığı GPLv2 lisanslıdır. İlk paket proje içi kullanım içindir; dış dağıtımdan önce uygulama lisansını veya uygun lisanslı üretici SDK alternatifini belirleyin. Kaynak ve üçüncü taraf bildirimleri pakete eklenir; ayrıntılar `THIRD_PARTY_NOTICES.md` içindedir.
 
 1. EXE'yi açın; Cloudflare HTTPS adresi, yönetici parolası ve izinli alt ağı girin. Algılanan alt ağ önerisini kontrol edin. Birden fazla alt ağ virgülle ayrılır. VPN veya farklı adaptörler varsa yalnızca cihazların bağlı olduğu alt ağları seçin.
