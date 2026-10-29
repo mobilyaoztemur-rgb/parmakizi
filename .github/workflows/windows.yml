@@ -1,0 +1,58 @@
+name: Windows EXE
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    tags: ['v*']
+    paths: ['gateway/**', 'desktop_entry.py', 'tests_desktop/**', '.github/workflows/windows.yml']
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: windows-latest
+    env:
+      CLOUD_API_URL: ${{ vars.CLOUD_API_URL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r gateway/requirements.txt pyinstaller==6.20.0
+      - name: Set public cloud endpoint
+        shell: python
+        run: |
+          import json, os
+          from pathlib import Path
+          from urllib.parse import urlsplit
+          url = os.environ.get('CLOUD_API_URL', '').strip()
+          if url:
+              parsed = urlsplit(url)
+              assert parsed.scheme == 'https' and parsed.hostname and not parsed.username and not parsed.password and not parsed.query and not parsed.fragment and parsed.path in ('', '/'), 'CLOUD_API_URL must be an HTTPS origin'
+          Path('gateway/defaults.json').write_text(json.dumps({'cloud_url': url}), encoding='utf-8')
+      - name: Test connector and Windows credential protection
+        run: python -m unittest discover -s gateway/tests -v
+      - name: Test native desktop
+        run: python -m unittest discover -s tests_desktop -v
+      - name: Build standalone executable
+        run: pyinstaller --noconfirm --clean --onefile --windowed --name Parmakizi --collect-all zk --collect-all tzdata --add-data "gateway/defaults.json;gateway" desktop_entry.py
+      - name: Write SHA-256 checksum
+        shell: pwsh
+        run: |
+          $hash = (Get-FileHash dist/Parmakizi.exe -Algorithm SHA256).Hash.ToLower()
+          "$hash  Parmakizi.exe" | Set-Content -Encoding ascii dist/Parmakizi.exe.sha256
+      - name: Include source and notices with the internal build
+        shell: pwsh
+        run: |
+          git archive HEAD --format=zip -o dist/Parmakizi-source.zip
+          Copy-Item THIRD_PARTY_NOTICES.md dist/
+          Copy-Item docs/licenses dist/licenses -Recurse
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Parmakizi-Windows-x64
+          path: |
+            dist/Parmakizi.exe
+            dist/Parmakizi.exe.sha256
+            dist/Parmakizi-source.zip
+            dist/THIRD_PARTY_NOTICES.md
+            dist/licenses/
+          if-no-files-found: error

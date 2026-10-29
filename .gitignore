@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.wrangler/
+.dev.vars
+.env*
+!.env.example
+.venv/
+__pycache__/
+*.pyc
+gateway/config.json
+gateway/*state.json
+*.log

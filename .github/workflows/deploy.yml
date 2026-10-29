@@ -1,0 +1,44 @@
+name: Deploy Cloudflare
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['worker/**', 'shared/**', 'migrations/**', 'wrangler.jsonc', 'package*.json', 'tsconfig.json', 'scripts/prepare_cloud.py', 'scripts/publish_secrets.py', '.github/workflows/deploy.yml']
+concurrency:
+  group: cloudflare-production
+  cancel-in-progress: false
+permissions:
+  contents: read
+jobs:
+  deploy:
+    if: github.event_name == 'workflow_dispatch' || vars.ENABLE_CLOUDFLARE_DEPLOY == 'true'
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+      SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm ci
+      - name: Check deployment configuration
+        shell: bash
+        run: |
+          test -n "$CLOUDFLARE_API_TOKEN" || { echo 'Set the production environment secret CLOUDFLARE_API_TOKEN'; exit 1; }
+          test -n "$CLOUDFLARE_ACCOUNT_ID" || { echo 'Set the repository variable CLOUDFLARE_ACCOUNT_ID'; exit 1; }
+          python -c "import os; assert len(os.environ.get('ADMIN_PASSWORD','')) >= 12 and len(os.environ.get('SESSION_SECRET','')) >= 32, 'Set production secrets ADMIN_PASSWORD (12+ chars), SESSION_SECRET (32+ random chars)'"
+      - name: Find or create D1 and bind it
+        run: python scripts/prepare_cloud.py
+      - run: npm run build
+      - run: npm run db:remote
+      - run: npx --no-install wrangler deploy
+      - name: Publish Worker runtime secrets securely
+        run: python scripts/publish_secrets.py

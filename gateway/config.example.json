@@ -1,0 +1,9 @@
+{
+  "cloud_url": "https://parmakizi.YOUR-SUBDOMAIN.workers.dev",
+  "gateway_token": "SET_AFTER_PAIRING",
+  "allowed_subnets": ["192.168.1.0/24"],
+  "timezone": "Europe/Istanbul",
+  "encoding": "utf-8",
+  "device_passwords": {},
+  "force_udp": false
+}

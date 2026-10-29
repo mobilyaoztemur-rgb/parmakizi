@@ -1,0 +1,24 @@
+{
+  "name": "parmakizi-cloud",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc --noEmit && wrangler deploy --dry-run --outdir dist",
+    "dev": "wrangler dev --ip 0.0.0.0 --port 8787",
+    "db:local": "wrangler d1 migrations apply parmakizi --local",
+    "db:remote": "wrangler d1 migrations apply parmakizi --remote",
+    "deploy": "npm run build && wrangler deploy",
+    "test": "python3 -m unittest discover -s gateway/tests -v",
+    "test:integration": "python3 -m unittest discover -s tests -v",
+    "configure:local": "python3 scripts/configure_local.py"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "5.20261029.1",
+    "typescript": "~5.9.3",
+    "wrangler": "4.155.0"
+  }
+}
