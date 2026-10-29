@@ -241,6 +241,44 @@ async function api(request: Request, env: Env): Promise<Response> {
     }
     return json({ id: deviceId }, 201);
   }
+  const deviceRoute = path.match(/^\/api\/devices\/([\w-]+)$/);
+  if (deviceRoute && (method === 'PATCH' || method === 'DELETE')) {
+    const deviceId = deviceRoute[1];
+    const device = await env.DB.prepare('SELECT * FROM devices WHERE id=?').bind(deviceId).first<Row>();
+    if (!device) throw new HttpError(404, 'Cihaz bulunamadı.');
+    if (method === 'PATCH') {
+      const b = await body(request);
+      const ip = privateIp(b.ip), port = integer(b.port, 'Port', 1, 65535);
+      const moved = ip !== device.ip || port !== device.port;
+      let result: D1Result;
+      try {
+        result = await env.DB.prepare(`UPDATE devices SET name=?,brand=?,model=?,ip=?,port=?,
+          last_contact=CASE WHEN ? THEN NULL ELSE last_contact END,
+          last_error=CASE WHEN ? THEN NULL ELSE last_error END,info=CASE WHEN ? THEN '{}' ELSE info END
+          WHERE id=? AND NOT EXISTS(SELECT 1 FROM jobs WHERE device_id=? AND status IN ('queued','running'))`)
+          .bind(text(b.name, 'Ad'), text(b.brand, 'Marka', 60), typeof b.model === 'string' ? b.model.slice(0, 100) : '', ip, port,
+            moved ? 1 : 0, moved ? 1 : 0, moved ? 1 : 0, deviceId, deviceId).run();
+      } catch (error) {
+        if (String(error).includes('UNIQUE constraint')) throw new HttpError(409, 'Bu IP ve port zaten kayıtlı.');
+        throw error;
+      }
+      if (!result.meta.changes) throw new HttpError(409, 'Cihazın bekleyen veya çalışan işlemi var; işlem bittikten sonra düzenleyin.');
+      await audit(env, 'admin', 'device.update', deviceId);
+      return json({ ok: true });
+    }
+    // Each statement checks the same condition inside D1's atomic batch. A queued or
+    // running command blocks removal, including a command added just before this batch.
+    const guard = "NOT EXISTS(SELECT 1 FROM jobs WHERE device_id=? AND status IN ('queued','running'))";
+    const result = await env.DB.batch([
+      env.DB.prepare(`DELETE FROM attendance WHERE device_id=? AND ${guard}`).bind(deviceId, deviceId),
+      env.DB.prepare(`DELETE FROM device_users WHERE device_id=? AND ${guard}`).bind(deviceId, deviceId),
+      env.DB.prepare(`DELETE FROM jobs WHERE device_id=? AND ${guard}`).bind(deviceId, deviceId),
+      env.DB.prepare(`DELETE FROM devices WHERE id=? AND ${guard}`).bind(deviceId, deviceId)
+    ]);
+    if (!result[3].meta.changes) throw new HttpError(409, 'Cihazın bekleyen veya çalışan işlemi var; işlem bitmeden kaldırılamaz.');
+    await audit(env, 'admin', 'device.delete', deviceId);
+    return json({ ok: true });
+  }
   if (path === '/api/jobs' && method === 'POST') {
     const b = await body(request);
     const requestId = text(b.requestId, 'İstek kimliği', 80);

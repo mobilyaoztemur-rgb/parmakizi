@@ -4,11 +4,15 @@
   "main": "worker/index.ts",
   "compatibility_date": "2026-10-01",
   "workers_dev": true,
-  "d1_databases": [{
-    "binding": "DB",
-    "database_name": "parmakizi",
-    "database_id": "00000000-0000-0000-0000-000000000000",
-    "migrations_dir": "migrations"
-  }],
-  "observability": { "enabled": true }
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "parmakizi",
+      "database_id": "72b9f224-fa87-4bc8-a0bb-1bd06559390d",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "observability": {
+    "enabled": true
+  }
 }

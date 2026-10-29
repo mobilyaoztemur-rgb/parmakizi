@@ -24,11 +24,12 @@ jobs:
           import json, os
           from pathlib import Path
           from urllib.parse import urlsplit
-          url = os.environ.get('CLOUD_API_URL', '').strip()
+          defaults = Path('gateway/defaults.json')
+          url = os.environ.get('CLOUD_API_URL', '').strip() or json.loads(defaults.read_text(encoding='utf-8')).get('cloud_url', '')
           if url:
               parsed = urlsplit(url)
               assert parsed.scheme == 'https' and parsed.hostname and not parsed.username and not parsed.password and not parsed.query and not parsed.fragment and parsed.path in ('', '/'), 'CLOUD_API_URL must be an HTTPS origin'
-          Path('gateway/defaults.json').write_text(json.dumps({'cloud_url': url}), encoding='utf-8')
+          defaults.write_text(json.dumps({'cloud_url': url}), encoding='utf-8')
       - name: Test connector and Windows credential protection
         run: python -m unittest discover -s gateway/tests -v
       - name: Test native desktop

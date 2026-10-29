@@ -18,9 +18,11 @@ EXE, D1'e Worker API üzerinden erişir. Cloudflare hesap anahtarı EXE'ye göm�
 - Yönetici girişi, süreli oturum ve Windows bilgisayarının bulutla eşleştirilmesi.
 - Seçili özel IPv4 alt ağında /24–/30 ile sınırlı TCP portu keşfi. Sonuçlar **cihaz adayıdır**; açık port, marka veya biyometrik cihaz doğrulaması değildir. UDP cihazlarını bulmak için IP ile ekleme kullanılabilir.
 - IP, port ve protokolle cihaz ekleme; bağlantı noktası seçimi.
+- Kayıtlı cihazı düzenleme ve bulut kayıtlarıyla birlikte kaldırma. Bekleyen/çalışan işlem varken bu değişiklikler engellenir; fiziksel cihazın belleği silinmez.
 - ZK TCP/UDP protokolü için `pyzk` adaptörü: cihaz bilgisi, personel okuma, geçiş kayıtlarını okuma, personel adı/sicili/kartını yazma ve cihazdan yeniden okuyarak doğrulama.
 - Mevcut personelin cihaz yetkisi, cihaz parolası ve grubu yazma sırasında korunur. Yeni personel normal kullanıcı olarak açılır.
 - Büyük kayıt listelerinin 40'lık paketlerle D1'e aktarılması (ücretsiz planın istek başına D1 sorgu sınırını gözetir), tekrarları engelleme, sayfalama, işlem ve denetim kayıtları.
+- Buluttaki personel/geçiş kayıtlarının tüm sayfalarıyla UTF-8 CSV dışa aktarımı. Elektronik tablo formülleri etkisizleştirilir; başarısız aktarım mevcut dosyayı bozmaz.
 - Açıkça seçilen simülatörle donanım gerektirmeyen uçtan uca test. Bağlantı hatası hiçbir zaman otomatik olarak simülatöre düşmez.
 - Windows anahtarları ve iletişim şifreleri Windows DPAPI ile kullanıcıya bağlı korunur. Yönetici parolası diske kaydedilmez.
 - GitHub Actions üzerinde Windows x64 EXE ve SHA-256 dosyası üretimi, kontroller ve Cloudflare yayın akışı.
@@ -84,7 +86,7 @@ Bulut geliştirme makinesinde ev dizini yazılamıyorsa `XDG_CONFIG_HOME=/tmp/pa
 6. Repository variable `CLOUD_API_URL` değerini yayınlanan HTTPS Worker adresi yapın. Windows derlemesi bunu yalnızca varsayılan sunucu adresi olarak gömer; kullanıcı girişte değiştirebilir.
 7. Otomatik ana dal yayını için repository variable `ENABLE_CLOUDFLARE_DEPLOY=true` yapın. Alternatif olarak `Deploy Cloudflare` workflow'unu elle çalıştırın. Başlangıçta otomatik dağıtım kapalıdır. Üretim workflow'u D1 kimliği yer tutucuysa hesabınızdaki `parmakizi` veritabanını bulur veya oluşturur; şemayı, API'yi ve çalışma zamanı gizli değişkenlerini yayımlar. Dolayısıyla GitHub yolunda 2–4. adımların elle yapılması gerekmez. Oluşturulan D1 kimliği çalışma sırasında bağlanır; her yeni yayında aynı isimdeki mevcut veritabanı kullanılır. Yerelde aynı hazırlık için `python scripts/prepare_cloud.py` kullanılabilir.
 
-Bu çalışma alanında canlı Cloudflare hesabı yapılandırılmış değildir. Yerel test başarısı canlı D1, canlı dağıtım veya Windows EXE derlemesinin tamamlandığını göstermez.
+Bu kurulumda `parmakizi` D1 veritabanı ve `https://parmakizi.mobilyaoztemur.workers.dev` API'si Cloudflare üzerinde oluşturulmuştur. Masaüstü uygulamasında varsayılan API adresi hazır gelir. İlk yayın canlı simülatör akışıyla doğrulanmıştır; son sürümün doğrulama sonucu dağıtım sırasında kontrol edilmelidir. Donanım uyumluluğu ayrıca sahada doğrulanır.
 
 ## Windows EXE alma ve kullanma
 
@@ -97,6 +99,7 @@ ZK adaptörünün `pyzk` bağımlılığı GPLv2 lisanslıdır. İlk paket proje
 3. `Cihaz ekle` ile IP/port ve doğru protokolü kaydedin. `İletişim ayarı` ile yerel ZK iletişim şifresini, gerektiğinde zorunlu UDP ve karakter kodlamasını ayarlayın. Cihaz şifresi buluta gönderilmez.
 4. `Cihaz bilgisi` ile gerçek bağlantıyı deneyin; sonra `Personel oku` veya `Geçişleri oku` kullanın. İlgili sekmede `Seçili cihazın bulut kayıtlarını yükle` ile D1 kayıtlarını görüntüleyin. İkinci bilgisayara bağlı cihazın işlemini o bilgisayar yürütür.
 5. `Personel yaz` mevcut aynı UID'yi güncelleyebilir; uygulama önce onay ister ve cihazdan geri okuma yapar. Sonucu `İşlemler` sekmesinde kontrol edin, bulut görünümünü yenilemek için yeniden `Personel oku` çalıştırın.
+6. Personel ve geçiş sekmelerindeki `Tüm kayıtları CSV kaydet`, seçilen cihazın buluttaki tüm sayfalarını dışa aktarır. Cihazlar sekmesinin altındaki düzenleme/kaldırma düğmeleri bulut kaydını yönetir. Cihaz kaldırma onayı, o cihazın bulut verilerini de siler; terminalin kendisindeki kayıtlar korunur.
 
 Yerel korumalı ayarlar `%LOCALAPPDATA%\Parmakizi\config.json` altındadır. DPAPI çözümü aynı Windows kullanıcısını gerektirir. Bağlantı noktasının anahtarı buluttan iptal edilebilir. EXE'nin dışarı doğru HTTPS ve yerel cihaz portlarına erişebilmesi gerekir. Cihaz portlarını internete açmayın.
 
@@ -109,6 +112,8 @@ python scripts/wait_api.py       # npm run dev çalışırken
 npm run test:integration          # gerçek yerel Worker + D1 + simülatör
 python -m unittest discover -s tests_desktop -v
 ```
+
+Canlı yayın sonrası doğrulama: `python -m scripts.smoke_live`. Ortamdan `ADMIN_PASSWORD`, `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` alır; geliştirme parolasını kullanmaz. Geçici bir simülatör bağlantı noktasıyla giriş, cihaz düzenleme/kaldırma, personel aktarımı, geçiş aktarımı ve anahtar iptalini kontrol eder. Sonunda yalnızca kendi oluşturduğu test kayıtlarını temizler; fiziksel cihaza bağlanmaz.
 
 Linux'ta masaüstü testinin bir X oturumu gerekir; CI `xvfb-run` kullanır. Windows DPAPI testi Linux'ta açıkça atlanır ve Windows workflow'unda çalışır. Donanım testi için ilgili cihazın IP, firmware, iletişim şifresi ve fiziksel erişimi gerekir.
 

@@ -33,23 +33,29 @@ class CloudClient:
         self.cookies = http.cookiejar.CookieJar()
         self.opener = urllib.request.build_opener(NoRedirect(), urllib.request.HTTPCookieProcessor(self.cookies))
 
-    def request(self, path, data=None, retries=0):
+    def request(self, path, data=None, retries=0, method=None):
         if not path.startswith("/api/") or path.startswith("//"):
             raise ValueError("Geçersiz API yolu.")
         payload = json.dumps(data, ensure_ascii=False).encode() if data is not None else None
-        headers = {"Accept": "application/json", "Origin": self.base_url}
+        headers = {"Accept": "application/json", "Origin": self.base_url, "User-Agent": "Parmakizi/0.1.0"}
         if payload is not None:
             headers["Content-Type"] = "application/json"
         if self.token:
             headers["Authorization"] = "Bearer " + self.token
         for attempt in range(retries + 1):
             try:
-                req = urllib.request.Request(self.base_url + path, data=payload, headers=headers)
+                req = urllib.request.Request(self.base_url + path, data=payload, headers=headers, method=method)
                 with self.opener.open(req, timeout=30) as response:
-                    return json.load(response)
+                    try:
+                        return json.load(response)
+                    except ValueError:
+                        raise ApiError(502, "Sunucudan geçerli JSON alınamadı; bulut adresini ve güvenlik ayarlarını kontrol edin.") from None
             except urllib.error.HTTPError as exc:
                 try:
-                    message = json.load(exc).get("error", "API hatası")
+                    result = json.load(exc)
+                    message = result.get("error") or result.get("title") or "API hatası"
+                    if not isinstance(message, str):
+                        message = "API hatası"
                 except (ValueError, AttributeError):
                     message = f"API HTTP {exc.code}"
                 if exc.code >= 500 and attempt < retries:

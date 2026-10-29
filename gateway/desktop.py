@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import csv
 from concurrent.futures import ThreadPoolExecutor
 import ipaddress
 import json
@@ -12,7 +13,7 @@ import subprocess
 import sys
 import threading
 import tkinter as tk
-from tkinter import ttk, messagebox, simpledialog
+from tkinter import ttk, messagebox, filedialog
 import urllib.parse
 import uuid
 
@@ -59,6 +60,8 @@ class App:
         self.events = queue.Queue()
         self.busy = 0
         self.closed = False
+        self.drain_after = None
+        self.refresh_after = None
         self.read_next = None
         self.read_kind = None
         self.read_device = None
@@ -86,7 +89,7 @@ class App:
         self.shell.pack(fill="both", expand=True)
         self.status = tk.StringVar(value="Giriş bekleniyor")
         self.show_login()
-        root.after(100, self.drain)
+        self.drain_after = root.after(100, self.drain)
 
     def submit(self, task, done=None):
         self.busy += 1
@@ -112,13 +115,16 @@ class App:
                         messagebox.showerror("İşlem tamamlanamadı", str(exc) if isinstance(exc, (ApiError, ValueError)) else "İşlem başarısız. Bağlantıyı ve yerel ayarları kontrol edin.")
         except queue.Empty:
             pass
-        self.root.after(100, self.drain)
+        self.drain_after = self.root.after(100, self.drain)
 
     def clear(self):
         for widget in self.shell.winfo_children():
             widget.destroy()
 
     def show_login(self):
+        if self.refresh_after:
+            self.root.after_cancel(self.refresh_after)
+            self.refresh_after = None
         self.clear()
         frame = ttk.Frame(self.shell, padding=32)
         frame.place(relx=.5, rely=.5, anchor="center")
@@ -158,7 +164,7 @@ class App:
                 self.data = data
                 self.show_dashboard()
                 self.pair_and_start()
-                self.root.after(10000, self.auto_refresh)
+                self.refresh_after = self.root.after(10000, self.auto_refresh)
             self.submit(task, connected)
 
         ttk.Button(frame, text="Buluta bağlan  →", style="Primary.TButton", command=login).pack(fill="x", pady=8)
@@ -223,6 +229,10 @@ class App:
             ttk.Button(toolbar, text=label, command=command).pack(side="left", padx=(0, 4))
         ttk.Label(tabs[0], text="Önce bir cihaz seçin. Simülatör kayıtları gerçek cihaz verisi değildir.", style="Sub.TLabel").pack(anchor="w", pady=(10, 0))
         self.devices = self.table(tabs[0], ("Cihaz", "Marka / model", "IP : port", "Protokol", "Bağlantı noktası", "Son başarılı işlem", "Son hata"))
+        device_tools = ttk.Frame(tabs[0])
+        device_tools.pack(fill='x')
+        ttk.Button(device_tools, text='Seçili cihazı düzenle', command=self.edit_device).pack(side='left')
+        ttk.Button(device_tools, text='Seçili cihazı buluttan kaldır', command=self.remove_device).pack(side='left', padx=8)
         self.users = self.table(tabs[1], ("UID", "Sicil", "Ad soyad", "Kart", "Cihaz yetkisi", "Son okuma"))
         self.attendance = self.table(tabs[2], ("Sicil", "Cihaz zamanı", "Saat dilimi", "UTC", "Durum", "Geçiş"))
         self.record_label = tk.StringVar(value="Cihazlar sekmesinde bir cihaz seçip kayıtları yükleyin.")
@@ -231,6 +241,7 @@ class App:
             bar.pack(fill="x")
             ttk.Button(bar, text="Seçili cihazın bulut kayıtlarını yükle", command=lambda k=kind: self.read_records(k, reset=True)).pack(side="left")
             ttk.Button(bar, text="Sonraki sayfa", command=lambda k=kind: self.read_records(k)).pack(side="left", padx=8)
+            ttk.Button(bar, text="Tüm kayıtları CSV kaydet", command=lambda k=kind: self.export_records(k)).pack(side='left', padx=(0, 8))
             ttk.Label(bar, textvariable=self.record_label, style="Sub.TLabel").pack(side="left")
         self.jobs = self.table(tabs[3], ("İşlem", "Cihaz", "Durum", "Başlangıç", "Hata / sonuç"), [140, 140, 140, 170, 400])
         self.jobs.bind("<Double-1>", self.job_details)
@@ -268,11 +279,12 @@ class App:
             self.submit(lambda: self.client.request("/api/overview"), self.render)
 
     def auto_refresh(self):
+        self.refresh_after = None
         if self.closed or not self.client:
             return
         if not self.busy:
             self.refresh()
-        self.root.after(10000, self.auto_refresh)
+        self.refresh_after = self.root.after(10000, self.auto_refresh)
 
     def selected_device(self):
         selected = self.devices.selection()
@@ -335,6 +347,31 @@ class App:
         if not self.preferences.get("gateway_id"):
             return
         self.form("Yerel ağ keşfi · TCP portu adayları", [("cidr", "İzinli alt ağ (/24–/30)", self.preferences["allowed_subnets"][0]), ("port", "Aranacak TCP portu", "4370")], lambda v: self.enqueue({"type": "discover", "gatewayId": self.preferences["gateway_id"], "cidr": v["cidr"], "port": int(v["port"])}))
+
+    def edit_device(self):
+        device = self.selected_device()
+        if not device:
+            return
+        def send(values):
+            values['port'] = int(values['port'])
+            moved = values['ip'] != device['ip'] or values['port'] != device['port']
+            if moved and not messagebox.askyesno('Cihaz adresi değişecek', 'Bu kaydın IP/portu değiştirilecek. Önceden okunan bulut kayıtları korunur. Yeni adres aynı fiziksel cihaza mı ait?'):
+                return
+            self.submit(lambda: self.client.request(f'/api/devices/{device["id"]}', values, method='PATCH'), lambda _: self.refresh())
+        self.form('Kayıtlı cihazı düzenle', [(key, label, device[key]) for key, label in [('name', 'Cihaz adı'), ('brand', 'Marka'), ('model', 'Model'), ('ip', 'Yerel IPv4 adresi'), ('port', 'Port')]], send)
+
+    def remove_device(self):
+        device = self.selected_device()
+        if not device:
+            return
+        if not messagebox.askyesno('Bulut kaydını kaldır', f'{device["name"]} ve bu cihaza ait buluttaki personel, geçiş ve işlem kayıtları silinsin mi?\n\nFiziksel cihazdaki bilgiler değişmez. Bu işlem geri alınamaz.'):
+            return
+        def done(_):
+            self.read_next = self.read_kind = self.read_device = None
+            self.users.delete(*self.users.get_children())
+            self.attendance.delete(*self.attendance.get_children())
+            self.refresh()
+        self.submit(lambda: self.client.request(f'/api/devices/{device["id"]}', {}, method='DELETE'), done)
 
     def write_user(self):
         device = self.selected_device()
@@ -399,6 +436,47 @@ class App:
             status = {"adapter": "Adaptör var · saha testi yok", "research": "Protokol tespiti gerekli", "planned": "Adaptör planlanıyor"}[row["status"]]
             self.catalog.insert("", "end", iid=str(i), values=(row["brand"], row["family"], row["protocol"], status, row["note"]))
 
+    def export_records(self, kind):
+        device = self.selected_device()
+        if not device:
+            return
+        filename = filedialog.asksaveasfilename(parent=self.root, title='Bulut kayıtlarını CSV kaydet', defaultextension='.csv', filetypes=[('CSV', '*.csv')], initialfile='parmakizi-' + kind + '.csv', confirmoverwrite=True)
+        if not filename:
+            return
+        def task():
+            headers = ('uid', 'user_id', 'name', 'card', 'privilege', 'synced_at') if kind == 'users' else ('user_id', 'device_local_time', 'timezone', 'recorded_at', 'status', 'punch')
+            path = Path(filename)
+            temporary = path.with_name('.' + path.name + '.' + str(uuid.uuid4()) + '.tmp')
+            count = 0
+            seen = set()
+            cursor = None
+            def safe(value):
+                value = '' if value is None else str(value)
+                return "'" + value if value.lstrip().startswith(('=', '+', '-', '@')) or value.startswith(('\t', '\r', '\n')) else value
+            try:
+                with temporary.open('x', newline='', encoding='utf-8-sig') as file:
+                    writer = csv.writer(file)
+                    writer.writerow(headers)
+                    while True:
+                        params = {'deviceId': device['id']}
+                        if cursor is not None:
+                            params['after' if kind == 'users' else 'before'] = cursor
+                        result = self.client.request(f'/api/{kind}?' + urllib.parse.urlencode(params))
+                        for row in result['records']:
+                            writer.writerow(safe(row[h]) for h in headers)
+                            count += 1
+                        cursor = result['next']
+                        if cursor is None:
+                            break
+                        if cursor in seen:
+                            raise ValueError('Dışa aktarma sayfası tekrarladı; dosya tamamlanmadı.')
+                        seen.add(cursor)
+                temporary.replace(path)
+            finally:
+                temporary.unlink(missing_ok=True)
+            return count
+        self.submit(task, lambda count: messagebox.showinfo('CSV kaydedildi', f'{count} bulut kaydı dışa aktarıldı.'))
+
     def catalog_details(self, _):
         selected = self.catalog.selection()
         if selected:
@@ -434,6 +512,9 @@ class App:
 
     def close(self):
         self.closed = True
+        for callback in (self.drain_after, self.refresh_after):
+            if callback:
+                self.root.after_cancel(callback)
         if self.connector:
             self.connector.stop.set()
         self.executor.shutdown(wait=False, cancel_futures=True)

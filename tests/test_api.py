@@ -155,6 +155,40 @@ class ApiTests(unittest.TestCase):
         row = next(j for j in self.admin.request('/api/overview')['jobs'] if j['id'] == job['id'])
         self.assertEqual(row['status'], 'uncertain')
 
+    def test_device_edit_and_removal_preserve_running_work(self):
+        self.queue('users.read')
+        job = self.claim()
+        self.upload(job, final=False, records=[{'uid': 1, 'userId': '1', 'name': 'Retained'}])
+        self.upload(job, final=True, summary={'count': 1})
+        self.queue('device.info')
+        patch = {'name': 'Edited', 'brand': 'Demo', 'model': 'Updated', 'ip': '192.168.1.202', 'port': 4370}
+        path = '/api/devices/' + self.device['id']
+        for method in ('PATCH', 'DELETE'):
+            with self.assertRaises(ApiError) as ctx:
+                self.admin.request(path, patch, method=method)
+            self.assertEqual(ctx.exception.status, 409)
+        self.assertEqual(self.admin.request('/api/users?deviceId=' + self.device['id'])['records'][0]['name'], 'Retained')
+        job = self.claim()
+        self.upload(job, final=True, summary={'simulated': True})
+        self.admin.request(path, patch, method='PATCH')
+        changed = next(d for d in self.admin.request('/api/overview')['devices'] if d['id'] == self.device['id'])
+        self.assertEqual(changed['ip'], '192.168.1.202')
+        self.assertIsNone(changed['last_contact'])
+        self.assertEqual(self.admin.request('/api/users?deviceId=' + self.device['id'])['records'][0]['name'], 'Retained')
+        self.admin.request(path, {}, method='DELETE')
+        overview = self.admin.request('/api/overview')
+        self.assertFalse(any(d['id'] == self.device['id'] for d in overview['devices']))
+        self.assertFalse(any(j['device_id'] == self.device['id'] for j in overview['jobs']))
+        self.assertEqual(self.admin.request('/api/users?deviceId=' + self.device['id'])['records'], [])
+
+    def test_device_edit_rejects_duplicate_network_address(self):
+        self.admin.request('/api/devices', {'name': 'Other', 'brand': 'Demo', 'ip': '192.168.1.202', 'port': 4370, 'driver': 'simulator', 'gatewayId': self.gateway['id']})
+        with self.assertRaises(ApiError) as ctx:
+            self.admin.request('/api/devices/' + self.device['id'], {'name': 'Clash', 'brand': 'Demo', 'ip': '192.168.1.202', 'port': 4370}, method='PATCH')
+        self.assertEqual(ctx.exception.status, 409)
+        device = next(d for d in self.admin.request('/api/overview')['devices'] if d['id'] == self.device['id'])
+        self.assertEqual(device['ip'], '192.168.1.201')
+
 
 if __name__ == '__main__':
     unittest.main()
