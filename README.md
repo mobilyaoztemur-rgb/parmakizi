@@ -22,6 +22,9 @@ EXE, D1'e Worker API üzerinden erişir. Cloudflare hesap anahtarı EXE'ye göm�
 - ZK TCP/UDP protokolü için `pyzk` adaptörü: cihaz bilgisi, personel okuma, geçiş kayıtlarını okuma, personel adı/sicili/kartını yazma ve cihazdan yeniden okuyarak doğrulama.
 - Mevcut personelin cihaz yetkisi, cihaz parolası ve grubu yazma sırasında korunur. Yeni personel normal kullanıcı olarak açılır.
 - Büyük kayıt listelerinin 40'lık paketlerle D1'e aktarılması (ücretsiz planın istek başına D1 sorgu sınırını gözetir), tekrarları engelleme, sayfalama, işlem ve denetim kayıtları.
+- Otomatik geçiş aktarımı: yeni masaüstü kayıtlarında 60 saniye; cihaz başına 30–86400 saniye arasında ayarlanabilir. Yerel önbellek yalnızca bulutun kabul ettiği kayıtların özetlerini tutar; elle `Geçişleri oku` tam yeniden aktarım yapar. Bu, periyodik senkronizasyondur; ADMS push veya sıfır gecikmeli canlı olay akışı değildir.
+- Uzaktan cihaz saati/ağ/kapasite bilgilerini okuma, bulut zamanıyla saat eşitleme ve yeniden başlatma. Yazma sonuçları kaybolursa otomatik tekrar yapılmaz. Cihaz IP/ağ maskesini değiştiren komutlar uygulanmadı.
+- İmzalı Windows güncellemeleri: Cloudflare’dan doğrulanmış iki EXE indirilir, aynı klasöre uygulanır; yeni uygulama açılışını doğrulamazsa eski dosyalar geri alınır. DPAPI ayarları ve kullanıcı dosyaları korunur.
 - Buluttaki personel/geçiş kayıtlarının tüm sayfalarıyla UTF-8 CSV dışa aktarımı. Elektronik tablo formülleri etkisizleştirilir; başarısız aktarım mevcut dosyayı bozmaz.
 - Açıkça seçilen simülatörle donanım gerektirmeyen uçtan uca test. Bağlantı hatası hiçbir zaman otomatik olarak simülatöre düşmez.
 - Windows anahtarları ve iletişim şifreleri Windows DPAPI ile kullanıcıya bağlı korunur. Yönetici parolası diske kaydedilmez.
@@ -33,7 +36,7 @@ EXE, D1'e Worker API üzerinden erişir. Cloudflare hesap anahtarı EXE'ye göm�
 
 İncelenen [pyzk kaynak dokümanı](https://github.com/fananimi/pyzk#compatible-devices), U580, T4-C, iClock260, iFace402/ID, MA300, iFace800/ID, K20, VF680, RSP10k1, K14, iFace702, F18/ID ve K40/ID gibi modellerin belirli firmware sürümlerini listeler. Aynı listede çalışmayan iClock260 firmware'i de vardır. Bunlar kütüphane yazarlarının bildirimleridir; bu projede fiziksel cihaz testi yapılmamıştır.
 
-Perkotek için model/OEM protokolü bulunmadan ZK desteği varsayılmaz. Suprema, Hikvision ve Anviz katalog araştırma girdileridir; adaptörleri henüz yoktur. Bazı üretici siteleri geliştirme ortamının ağ politikası nedeniyle okunamadı; bu durum katalogda belirtilir. Otomatik marka tanıma uygulanmadı.
+Perkotek için model/OEM protokolü bulunmadan ZK desteği varsayılmaz. 30 Ekim 2026 araştırmasında resmî Perkotek ve ZKTeco kategori/ürün sayfalarından **77 model girdisi** derlendi (72 Perkotek, 5 ZKTeco); ayrıca yukarıdaki pyzk uyumluluk listesi incelendi. Bu envanter, tüm tarihî modellerin eksiksiz listesi veya adaptör desteği anlamına gelmez. Resmî Perkotek sayfalarındaki TCP/IP ibaresi ZK komut uyumluluğunu kanıtlamaz. Kaynaklar ve araştırma sınırları [cihaz envanterinde](docs/device-compatibility.md) ve uygulamanın Uyumluluk sekmesindedir. Envanter `python scripts/research_models.py` ile yenilenebilir. Suprema, Hikvision ve Anviz için ayrı adaptörler henüz yoktur. Otomatik marka tanıma uygulanmadı.
 
 Biyometrik parmak izi/yüz şablonlarının aktarımı, uzaktan kayıt başlatma, kapı açma, cihaz sıfırlama, silme, ADMS push sunucusu ve diğer üretici SDK'ları bu sürümde uygulanmadı. Şu anda tek yönetici hesabı vardır; çok kullanıcılı roller henüz yoktur. Personel okuma son görülen kayıtları günceller; cihazdan silinmiş kişileri buluttan otomatik silmez. Geçişler eşsiz cihaz/sicil/zaman/durum/geçiş birleşimine göre tutulur. Aynı saniyedeki tamamen aynı cihaz kayıtları tek olay olarak değerlendirilir.
 
@@ -90,9 +93,11 @@ Bu kurulumda `parmakizi` D1 veritabanı ve `https://parmakizi.mobilyaoztemur.wor
 
 ## Windows EXE alma ve kullanma
 
-`Windows EXE` workflow'u `main` üzerindeki masaüstü değişikliklerinde, `v*` etiketlerinde veya elle çalıştırıldığında Windows runner üzerinde Python ve Tkinter dahil bağımsız `Parmakizi.exe` üretir. Actions çalıştırmasının **Artifacts → Parmakizi-Windows-x64** paketini indirin. EXE dijital olarak imzalanmamıştır; yayımlama için kod imzalama sertifikası ayrıca gerekir. SHA-256 dosyası aynı pakettedir.
+`Windows EXE` workflow'u `main` üzerindeki masaüstü değişikliklerinde, `v*` etiketlerinde veya elle çalıştırıldığında Windows runner üzerinde Python ve Tkinter dahil bağımsız **`Parmakizi.exe` ve `ParmakiziUpdater.exe`** üretir. Actions çalıştırmasının **Artifacts → Parmakizi-Windows-x64** paketini indirin, ZIP'i bir klasöre çıkarıp `Parmakizi.exe` dosyasını açın. `ParmakiziUpdater.exe` kullanıcı tarafından doğrudan açılmaz. Dosyalar Windows Authenticode sertifikasıyla imzalanmamıştır; güncelleme paketinin bütünlüğü ayrı Ed25519 imzasıyla doğrulanır. İki EXE'nin SHA-256 dosyaları aynı pakettedir.
 
 Derlenen EXE, paketlenmiş haliyle Windows runner üzerinde ayrıca başlatılır. Pencere kurulumu, içindeki varsayılan adresle canlı HTTPS API bağlantısı, kimliksiz erişimin reddi ve DPAPI şifreleme/çözme kontrol edilir. Gizli değer içermeyen sonuç `self-test.json` olarak pakete eklenir. Bu kontrol fiziksel cihaz uyumluluğunu doğrulamaz.
+
+Paketlenmiş güncelleyicinin bağımlılıkları ve doğrulama anahtarı da kontrol edilir (`helper-self-test.json`). Windows testinde geçici klasördeki program gerçek EXE ile değiştirilir, yeni pencerenin açılış onayı beklenir ve kullanıcı dosyalarının korunduğu doğrulanır. Hatalı açılışta geri alma ayrıca test edilir.
 
 ZK adaptörünün `pyzk` bağımlılığı GPLv2 lisanslıdır. İlk paket proje içi kullanım içindir; dış dağıtımdan önce uygulama lisansını veya uygun lisanslı üretici SDK alternatifini belirleyin. Kaynak ve üçüncü taraf bildirimleri pakete eklenir; ayrıntılar `THIRD_PARTY_NOTICES.md` içindedir.
 
@@ -102,6 +107,8 @@ ZK adaptörünün `pyzk` bağımlılığı GPLv2 lisanslıdır. İlk paket proje
 4. `Cihaz bilgisi` ile gerçek bağlantıyı deneyin; sonra `Personel oku` veya `Geçişleri oku` kullanın. İlgili sekmede `Seçili cihazın bulut kayıtlarını yükle` ile D1 kayıtlarını görüntüleyin. İkinci bilgisayara bağlı cihazın işlemini o bilgisayar yürütür.
 5. `Personel yaz` mevcut aynı UID'yi güncelleyebilir; uygulama önce onay ister ve cihazdan geri okuma yapar. Sonucu `İşlemler` sekmesinde kontrol edin, bulut görünümünü yenilemek için yeniden `Personel oku` çalıştırın.
 6. Personel ve geçiş sekmelerindeki `Tüm kayıtları CSV kaydet`, seçilen cihazın buluttaki tüm sayfalarını dışa aktarır. Cihazlar sekmesinin altındaki düzenleme/kaldırma düğmeleri bulut kaydını yönetir. Cihaz kaldırma onayı, o cihazın bulut verilerini de siler; terminalin kendisindeki kayıtlar korunur.
+7. `Otomatik aktarım` ile aralığı ayarlayın. Eski sürümden kalan cihazlarda özellik başlangıçta kapalıdır; yeni masaüstü kayıtlarında 60 saniyede açıktır. Cihazla aynı ağdaki eşleştirilmiş program açık olmalıdır. Ağ kesilince cihazın sakladığı kayıtlar bağlantı geri geldiğinde yeniden okunur; cihazın kendi log kapasitesi sınırlıdır.
+8. `Uzaktan cihaz ayarları` ile saat/ağ/kapasite bilgisi okuyabilir, cihaz saatini eşitleyebilir ve yeniden başlatabilirsiniz. Saat dilimini yerel `İletişim ayarı` içinden IANA adıyla (örn. `Europe/Istanbul`) seçin. Ayar ve yeniden başlatma komutları fiziksel firmware desteğine bağlıdır.
 
 Yerel korumalı ayarlar `%LOCALAPPDATA%\Parmakizi\config.json` altındadır. DPAPI çözümü aynı Windows kullanıcısını gerektirir. Bağlantı noktasının anahtarı buluttan iptal edilebilir. EXE'nin dışarı doğru HTTPS ve yerel cihaz portlarına erişebilmesi gerekir. Cihaz portlarını internete açmayın.
 
@@ -117,10 +124,30 @@ python -m unittest discover -s tests_desktop -v
 
 Canlı yayın sonrası doğrulama: `python -m scripts.smoke_live`. Ortamdan `ADMIN_PASSWORD`, `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` alır; geliştirme parolasını kullanmaz. Geçici bir simülatör bağlantı noktasıyla giriş, cihaz düzenleme/kaldırma, personel aktarımı, geçiş aktarımı ve anahtar iptalini kontrol eder. Sonunda yalnızca kendi oluşturduğu test kayıtlarını temizler; fiziksel cihaza bağlanmaz.
 
+## Klasör içi güncellemeler ve Cloudflare dağıtımı
+
+**0.1 sürümünde güncelleyici yoktur. 0.2 paketini bir kere elle indirip çıkarın.** Sonraki sürümler uygulamadaki `Güncellemeler` düğmesinden ve açılış kontrolünden bulunur. İndirmek için uygulama oturumu veya bu bilgisayarın geçerli bağlantı anahtarı gerekir. Uygulama yeni sürümü uygulamadan önce onay ister; devam eden cihaz komutu varsa bekler. Programın bulunduğu klasör yazılabilir olmalı ve ana dosya `Parmakizi.exe` adını korumalıdır.
+
+Güncelleme dosyaları Cloudflare Workers Static Assets üzerinden, erişim kontrolünden sonra sunulur. İmzalı sürüm bildirimi D1'de tutulur. Bu hesapta R2 etkin olmadığı için R2 veya ek bir depolama hizmeti gerekmez. Her EXE, Static Assets'in [dosya başına 25 MiB sınırını](https://developers.cloudflare.com/workers/static-assets/platform/limits/) aşmamalıdır.
+
+Derleme Windows gerektirir: Cloudflare Workers ve Cloudflare Builds'in Linux ortamı bu Windows/Tkinter/DPAPI EXE'lerini doğrudan derleyemez. GitHub Windows runner derler ve test eder; Cloudflare dağıtır. Kaynakta yalnızca `gateway/update-key.pem` açık doğrulama anahtarı bulunur. Ed25519 özel anahtarı Worker'ın `UPDATES_SIGNING_KEY` secret'ında kalır ve normal yayınlarda değiştirilmez. Yeni bir kurulumda anahtar değişirse açık anahtarın gömülü olduğu Windows paketleri de yeniden üretilmelidir.
+
+Test edilmiş Actions paketinden güncelleme yayımlamak için proje kökünde, güvenli ortam değişkenleri hazırken:
+
+```sh
+python scripts/publish_update.py --artifact /path/to/Parmakizi-Windows-x64 --notes "Sürüm açıklaması"
+```
+
+Yayıncı iki EXE'nin özetlerini, Windows test raporlarını ve açık anahtar parmak izini doğrular; mevcut dağıtım dosyalarını korur; yeni dosyaları Cloudflare'a gönderir; CDN üzerinden tekrar indirerek SHA-256 doğrular; yönetici oturumuyla imzalı sürümü yayımlar. Aynı sürüm numarası farklı dosyalarla tekrar yayımlanamaz.
+
+GitHub'da otomatik güncelleme yayını için `ENABLE_UPDATE_PUBLISH=true` repository variable ve `production` ortamında `CLOUDFLARE_API_TOKEN`, `ADMIN_PASSWORD` secret'ları ile `CLOUDFLARE_ACCOUNT_ID` variable gerekir. Bu ayarlar Codex ortamındaki bağlamalardan ayrıdır; gizli değerler otomatik olarak GitHub'a kopyalanmaz. Değişken açık değilse derleme/artifact üretimi çalışır, Cloudflare yayın işi atlanır. Bu oturumun güvenli Cloudflare bağlamalarıyla yayın yapmak için ek GitHub secret'ı gerekmez.
+
+**Sunucu yenilerken `npm run deploy` kullanın.** Bu komut ve iki yayın workflow'u mevcut imzalı güncellemenin dosyalarını yeni varlık dağıtımına taşır. Dosyaları hazırlamadan doğrudan `wrangler deploy` yapmak mevcut güncelleme indirme yollarını kaldırabilir. Güncelleyici `.parmakizi-updates` altına yedek ve işlem sonucu bırakır; yerel kullanıcı ayarları `%LOCALAPPDATA%\Parmakizi` altında kalır.
+
 Linux'ta masaüstü testinin bir X oturumu gerekir; CI `xvfb-run` kullanır. Windows DPAPI testi Linux'ta açıkça atlanır ve Windows workflow'unda çalışır. Donanım testi için ilgili cihazın IP, firmware, iletişim şifresi ve fiziksel erişimi gerekir.
 
 ## İşlem güvenceleri ve işletim sınırları
 
-Her bağlantı noktasında aynı anda tek görev sahiplenilir. Görev sahiplenme ve istemci istek kimlikleri tekrar yazmayı engeller. Görev sonucu gelmezse 10 dakikalık süre sonunda yazma işlemi `uncertain` olur; otomatik tekrar gönderilmez. Cihazdan okuyup sonucu kontrol edin. Okuma paketleri tamamlanmadan aktarılan kayıtlar bulutta görünebilir; aktarımın tamamlandığını görev durumu gösterir. Geçiş zamanları cihazın yerel zamanı ve `Europe/Istanbul` saat dilimiyle UTC'ye dönüştürülür; diğer bölgeler için CLI bağlantı yapılandırması değiştirilmeli. Mevcut Windows arayüzü Türkiye saat dilimini kullanır.
+Her bağlantı noktasında aynı anda tek görev sahiplenilir; elle verilen komutlar otomatik okumadan önce gelir. Görev sahiplenme ve istemci istek kimlikleri tekrar yazmayı engeller. Görev sonucu gelmezse 10 dakikalık süre sonunda personel yazma, saat eşitleme veya yeniden başlatma `uncertain` olur; otomatik tekrar gönderilmez. Cihazdan okuyup sonucu kontrol edin. Okuma paketleri tamamlanmadan aktarılan kayıtlar bulutta görünebilir; aktarımın tamamlandığını görev durumu gösterir. Geçiş zamanları yerel iletişim ayarındaki saat dilimiyle UTC'ye dönüştürülür (başlangıç: `Europe/Istanbul`).
 
-Bu ilk sürüm, tam erişim kontrol yazılımı sertifikasyonu veya bütün cihazlarla saha uyumluluğu iddiası taşımaz. D1 yedekleme, veri saklama süresi, çok kullanıcılı roller, şifre döndürme ekranı, otomatik EXE güncellemesi ve imzalı dağıtım üretim ihtiyaçlarına göre tamamlanmalıdır.
+Bu sürüm, tam erişim kontrol yazılımı sertifikasyonu veya bütün cihazlarla saha uyumluluğu iddiası taşımaz. D1 yedekleme, veri saklama süresi, çok kullanıcılı roller, şifre döndürme ekranı ve Authenticode sertifikası üretim ihtiyaçlarına göre ayrıca hazırlanmalıdır.

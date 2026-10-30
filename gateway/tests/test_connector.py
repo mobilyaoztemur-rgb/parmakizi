@@ -66,7 +66,7 @@ class AdapterTests(unittest.TestCase):
         def fake(_):
             yield connection
         with patch.object(adapter, 'connection', fake):
-            _, summary = adapter.execute({}, 'users.upsert', {'uid': 7, 'userId': '71', 'name': 'Yeni', 'card': 77})
+            _, summary = adapter.execute({'ip': '192.168.1.201', 'port': 4370}, 'users.upsert', {'uid': 7, 'userId': '71', 'name': 'Yeni', 'card': 77})
         args = connection.set_user.call_args.kwargs
         self.assertEqual((args['privilege'], args['password'], args['group_id']), (14, 'local-only-test', '2'))
         self.assertTrue(summary['verified'])
@@ -79,7 +79,7 @@ class AdapterTests(unittest.TestCase):
         def fake(_):
             yield connection
         with patch.object(adapter, 'connection', fake), self.assertRaises(ValueError):
-            adapter.execute({}, 'users.upsert', {'uid': 1, 'userId': '1', 'name': 'Test', 'card': 0})
+            adapter.execute({'ip': '192.168.1.201', 'port': 4370}, 'users.upsert', {'uid': 1, 'userId': '1', 'name': 'Test', 'card': 0})
 
     def test_attendance_timezone_conversion(self):
         adapter = ZktecoAdapter({'timezone': 'Europe/Istanbul'})
@@ -89,7 +89,7 @@ class AdapterTests(unittest.TestCase):
         def fake(_):
             yield connection
         with patch.object(adapter, 'connection', fake):
-            records, _ = adapter.execute({}, 'attendance.read', {})
+            records, _ = adapter.execute({'ip': '192.168.1.201', 'port': 4370}, 'attendance.read', {})
         self.assertEqual(records[0]['recordedAt'], '2026-10-29T09:00:00+03:00')
         connection.disable_device.assert_not_called()
 
@@ -100,6 +100,26 @@ class AdapterTests(unittest.TestCase):
             with patch.object(connector.client, 'request', side_effect=ConnectionError), self.assertRaises(ConnectionError):
                 connector.process(job)
             execute.assert_called_once_with(job)
+
+    def test_clock_sync_uses_cloud_time_and_checks_readback(self):
+        adapter = ZktecoAdapter({'timezone': 'Europe/Istanbul'})
+        connection = Mock()
+        connection.get_time.return_value = datetime(2026, 10, 30, 9, 0, 0)
+        @contextmanager
+        def fake(_):
+            yield connection
+        with patch.object(adapter, 'connection', fake), patch('gateway.connector.time.monotonic', return_value=100):
+            _, result = adapter.execute({'ip': '192.168.1.201', 'port': 4370}, 'device.time.sync', {'serverTime': '2026-10-30T06:00:00Z', '_received_monotonic': 100})
+        connection.set_time.assert_called_once_with(datetime(2026, 10, 30, 9, 0, 0))
+        self.assertTrue(result['verified'])
+
+    def test_failed_upload_does_not_acknowledge_attendance_cache(self):
+        connector = Connector({'cloud_url': 'https://example.com', 'gateway_token': 'test', 'allowed_subnets': ['192.168.1.0/24']})
+        row = {'userId': '1', 'recordedAt': '2026-10-30T06:00:00Z', 'status': 1, 'punch': 0}
+        job = {'id': 'j', 'type': 'attendance.read', 'origin': 'scheduled', 'params': {}, 'claimToken': 'claim', 'device': {'id': 'd'}}
+        with patch.object(connector, 'execute', return_value=([row], {'count': 1})), patch.object(connector.client, 'request', side_effect=ConnectionError), self.assertRaises(ConnectionError):
+            connector.process(job)
+        self.assertEqual(connector.cache.unseen('d', [row]), [row])
 
 
 if __name__ == '__main__':

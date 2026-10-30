@@ -4,16 +4,18 @@ from __future__ import annotations
 import argparse
 import concurrent.futures
 from contextlib import contextmanager
-from datetime import datetime
+from datetime import datetime, timedelta
 import ipaddress
 import json
 import logging
 from pathlib import Path
 import socket
 import threading
+import time
 from zoneinfo import ZoneInfo
 
 from gateway.client import CloudClient, ApiError
+from gateway.attendance_cache import AttendanceCache
 
 LOG = logging.getLogger("parmakizi.connector")
 PRIVATE = tuple(ipaddress.ip_network(x) for x in ("10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"))
@@ -62,11 +64,19 @@ class Simulator:
     """Explicit demo driver, never selected based on connection failures."""
     def __init__(self):
         self.users_by_device = {}
+        self.clock_by_device = {}
 
     def execute(self, device, action, params):
         users = self.users_by_device.setdefault(device["id"], [{"uid": 1, "userId": "1001", "name": "Demo Kullanıcı", "card": 0, "privilege": 0}])
         if action == "device.info":
             return [], {"serial": "SIM-" + device["id"][:8], "platform": "Simülatör", "firmware": "demo-1", "users": len(users), "simulated": True}
+        if action == 'device.settings.read':
+            return [], {'deviceTime': self.clock_by_device.get(device['id'], '2026-10-30T09:00:00'), 'timezone': 'Europe/Istanbul', 'network': {'ip': device['ip'], 'mask': '255.255.255.0', 'gateway': '192.168.1.1'}, 'capacity': {'users': len(users), 'records': 1}, 'simulated': True}
+        if action == 'device.time.sync':
+            self.clock_by_device[device['id']] = datetime.fromisoformat(params['serverTime'].replace('Z', '+00:00')).astimezone(ZoneInfo('Europe/Istanbul')).replace(tzinfo=None).isoformat()
+            return [], {'deviceTime': self.clock_by_device[device['id']], 'verified': True, 'simulated': True}
+        if action == 'device.restart':
+            return [], {'acknowledged': True, 'simulated': True}
         if action == "users.read":
             return [dict(x) for x in users], {"count": len(users), "simulated": True}
         if action == "attendance.read":
@@ -111,9 +121,35 @@ class ZktecoAdapter:
                     LOG.warning("Cihaz bağlantısı kapatılırken hata oluştu.")
 
     def execute(self, device, action, params):
+        options = self.config.get('device_settings', {}).get(f'{device["ip"]}:{device["port"]}', {})
+        timezone = ZoneInfo(options.get('timezone', self.config.get('timezone', 'Europe/Istanbul')))
         with self.connection(device) as conn:
             if action == "device.info":
                 return [], {"serial": str(conn.get_serialnumber()), "platform": str(conn.get_platform()), "firmware": str(conn.get_firmware_version())}
+            if action == 'device.settings.read':
+                settings = {'deviceTime': conn.get_time().isoformat(), 'timezone': str(timezone), 'network': conn.get_network_params(),
+                            'controls': ['device.time.sync', 'device.restart'], 'protocol': 'ZK TCP/UDP'}
+                try:
+                    conn.read_sizes()
+                    settings['capacity'] = {name: getattr(conn, name, None) for name in ('users', 'users_cap', 'fingers', 'fingers_cap', 'records', 'rec_cap')}
+                except Exception:
+                    settings['capacityUnavailable'] = True
+                return [], settings
+            if action == 'device.time.sync':
+                anchor = datetime.fromisoformat(params['serverTime'].replace('Z', '+00:00'))
+                if anchor.tzinfo is None:
+                    raise ValueError('Saat dilimi içeren sunucu zamanı gerekiyor.')
+                elapsed = max(0, time.monotonic() - params.get('_received_monotonic', time.monotonic()))
+                target = (anchor + timedelta(seconds=elapsed)).astimezone(timezone).replace(tzinfo=None, microsecond=0)
+                conn.set_time(target)
+                observed = conn.get_time()
+                if abs((observed - target).total_seconds()) > 10:
+                    raise ValueError('Cihaz saati geri okunarak doğrulanamadı.')
+                return [], {'deviceTime': observed.isoformat(), 'timezone': str(timezone), 'verified': True}
+            if action == 'device.restart':
+                if not conn.restart():
+                    raise ValueError('Yeniden başlatma komutu onaylanmadı.')
+                return [], {'acknowledged': True, 'note': 'Komut onaylandı; yeniden çevrimiçi olduğunu ayrıca kontrol edin.'}
             if action == "users.read":
                 records = [{"uid": int(u.uid), "userId": str(u.user_id), "name": u.name, "card": int(u.card or 0), "privilege": int(u.privilege)} for u in conn.get_users()]
                 return records, {"count": len(records)}
@@ -121,8 +157,8 @@ class ZktecoAdapter:
                 records = []
                 for r in conn.get_attendance():
                     local = r.timestamp
-                    aware = local.replace(tzinfo=self.timezone) if local.tzinfo is None else local
-                    records.append({"userId": str(r.user_id), "recordedAt": aware.isoformat(), "localTime": local.replace(tzinfo=None).isoformat(), "timezone": str(self.timezone), "status": int(r.status), "punch": int(r.punch)})
+                    aware = local.replace(tzinfo=timezone) if local.tzinfo is None else local
+                    records.append({"userId": str(r.user_id), "recordedAt": aware.isoformat(), "localTime": local.replace(tzinfo=None).isoformat(), "timezone": str(timezone), "status": int(r.status), "punch": int(r.punch)})
                 return records, {"count": len(records)}
             if action == "users.upsert":
                 users = conn.get_users()
@@ -146,6 +182,8 @@ class Connector:
         self.allowed = networks(config["allowed_subnets"])
         self.client = CloudClient(config["cloud_url"], config["gateway_token"], allow_local)
         self.stop = threading.Event()
+        self.job_lock = threading.Lock()
+        self.cache = AttendanceCache(config.get('attendance_cache', ':memory:'))
         self.simulator = Simulator()
         self.zk = ZktecoAdapter(config)
         self.status = status or (lambda message: LOG.info("%s", message))
@@ -166,6 +204,8 @@ class Connector:
         path = f'/api/gateway/jobs/{job["id"]}/result'
         try:
             self.status("Çalışıyor: " + job["type"])
+            if job['type'] == 'device.time.sync':
+                job['params']['_received_monotonic'] = time.monotonic()
             records, summary = self.execute(job)
         except Exception:
             # SDK errors can contain packet payloads or credentials. Keep the public error generic.
@@ -173,11 +213,18 @@ class Connector:
                                      "error": "Cihaz işlemi tamamlanamadı. IP, izinli alt ağ, protokol ve yerel iletişim şifresini kontrol edin. Yazma işlemini yeniden göndermeden önce cihazı okuyun."})
             self.status("Cihaz işlemi başarısız: " + job["type"])
             return
+        if job['type'] == 'attendance.read':
+            if job.get('origin') == 'scheduled':
+                records = self.cache.unseen(job['device']['id'], records)
+            summary['uploaded'] = len(records)
         # A failed upload must never re-execute the device command. Only retry these idempotent uploads.
         for offset in range(0, len(records), 40):
             if self.stop.is_set():
                 return
-            self.client.request(path, {"claimToken": job["claimToken"], "final": False, "records": records[offset:offset + 40]}, retries=3)
+            batch = records[offset:offset + 40]
+            self.client.request(path, {"claimToken": job["claimToken"], "final": False, "records": batch}, retries=3)
+            if job['type'] == 'attendance.read':
+                self.cache.acknowledge(job['device']['id'], batch)
         self.client.request(path, {"claimToken": job["claimToken"], "final": True, "summary": summary}, retries=3)
         self.status("Tamamlandı: " + job["type"])
 
@@ -185,12 +232,15 @@ class Connector:
         delay = 3
         while not self.stop.is_set():
             try:
-                result = self.client.request("/api/gateway/poll", {})
-                delay = 3
-                if result["job"]:
-                    self.process(result["job"])
-                else:
-                    self.status("Buluta bağlı · görev bekleniyor")
+                with self.job_lock:
+                    if self.stop.is_set():
+                        return
+                    result = self.client.request("/api/gateway/poll", {})
+                    delay = 5
+                    if result["job"]:
+                        self.process(result["job"])
+                    else:
+                        self.status("Buluta bağlı · görevler ve aktarım takvimi bekleniyor")
             except ApiError as exc:
                 self.status(str(exc))
                 if exc.status == 401:
@@ -203,6 +253,16 @@ class Connector:
             if once:
                 return
             self.stop.wait(delay)
+
+    def quiesce(self):
+        """Stop between commands, so an update cannot interrupt a device write."""
+        if not self.job_lock.acquire(blocking=False):
+            return False
+        try:
+            self.stop.set()
+            return True
+        finally:
+            self.job_lock.release()
 
 
 def main():

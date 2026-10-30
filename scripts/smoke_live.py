@@ -40,8 +40,11 @@ def main():
     gateway = None
     job_ids = []
     try:
-        if admin.request('/api/health').get('ok') is not True:
+        health = admin.request('/api/health')
+        if health.get('ok') is not True:
             raise RuntimeError('Canlı API hazır değil.')
+        if health.get('version') != json.loads(Path('package.json').read_text())['version']:
+            raise RuntimeError('Canlı API yeni sürüme henüz geçmedi; kenar yayılımını bekleyin.')
         try:
             CloudClient(base).request('/api/overview')
         except ApiError as error:
@@ -78,6 +81,15 @@ def main():
         records = admin.request('/api/attendance?deviceId=' + device['id'])['records']
         if len(records) != 1 or records[0]['recorded_at'] != '2026-10-29T06:00:00.000Z':
             raise RuntimeError('Geçiş aktarımı veya tekrar engelleme doğrulanamadı.')
+        admin.request('/api/devices/' + device['id'] + '/sync', {'enabled': True, 'intervalSeconds': 30}, method='PATCH')
+        connector.run(once=True)
+        synced = next(d for d in admin.request('/api/overview')['devices'] if d['id'] == device['id'])
+        if not synced['last_sync_at']:
+            raise RuntimeError('Otomatik aktarım doğrulanamadı.')
+        admin.request('/api/devices/' + device['id'] + '/sync', {'enabled': False, 'intervalSeconds': 30}, method='PATCH')
+        run('device.settings.read')
+        run('device.time.sync')
+        run('device.restart')
         admin.request('/api/devices/' + device['id'], {}, method='DELETE')
         if any(d['id'] == device['id'] for d in admin.request('/api/overview')['devices']):
             raise RuntimeError('Geçici cihaz kaldırılamadı.')
@@ -89,7 +101,7 @@ def main():
                 raise
         else:
             raise RuntimeError('İptal edilen bağlantı anahtarı hâlâ çalışıyor.')
-        print('Canlı D1/API: giriş, anahtar eşleştirme, cihaz düzenleme/kaldırma, simülatör bilgisi, personel yazma/okuma, geçiş aktarımı, tekrar engelleme ve anahtar iptali başarılı.')
+        print('Canlı D1/API: giriş, eşleştirme, cihaz yönetimi, personel/geçiş aktarımı, otomatik zamanlama, uzaktan saat/ayar/yeniden başlatma ve anahtar iptali başarılı (simülatör).')
     finally:
         if gateway:
             # All deletes are scoped to the random gateway created by this run.

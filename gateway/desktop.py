@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 from concurrent.futures import ThreadPoolExecutor
 import ipaddress
 import json
@@ -21,8 +22,11 @@ import uuid
 from gateway.client import CloudClient, ApiError
 from gateway.connector import Connector, networks
 from gateway.storage import load_settings, save_settings, dpapi
+from gateway.storage import config_path
+from gateway.version import VERSION
+from gateway.updater import UpdateClient, stage_update, launch_update
 
-TYPES = {"device.info": "Cihaz bilgisi", "users.read": "Personel oku", "attendance.read": "Geçişleri oku", "users.upsert": "Personel yaz", "discover": "Ağ keşfi"}
+TYPES = {"device.info": "Cihaz bilgisi", "users.read": "Personel oku", "attendance.read": "Geçişleri oku", "users.upsert": "Personel yaz", "discover": "Ağ keşfi", 'device.settings.read': 'Cihaz ayarlarını oku', 'device.time.sync': 'Cihaz saatini eşitle', 'device.restart': 'Cihazı yeniden başlat'}
 STATES = {"queued": "Bekliyor", "running": "Çalışıyor", "succeeded": "Tamamlandı", "failed": "Başarısız", "uncertain": "Cihazdan kontrol edin"}
 
 
@@ -63,6 +67,9 @@ class App:
         self.closed = False
         self.drain_after = None
         self.refresh_after = None
+        self.update_after = None
+        self.updating = False
+        self.update_checking = False
         self.read_next = None
         self.read_kind = None
         self.read_device = None
@@ -91,11 +98,12 @@ class App:
         self.status = tk.StringVar(value="Giriş bekleniyor")
         self.show_login()
         self.drain_after = root.after(100, self.drain)
+        self.update_after = root.after(1500, lambda: self.check_updates(manual=False))
 
-    def submit(self, task, done=None):
+    def submit(self, task, done=None, on_error=None):
         self.busy += 1
         future = self.executor.submit(task)
-        future.add_done_callback(lambda f: self.events.put(("done", (f, done))))
+        future.add_done_callback(lambda f: self.events.put(("done", (f, done, on_error))))
 
     def drain(self):
         if self.closed:
@@ -106,14 +114,17 @@ class App:
                 if kind == "status":
                     self.status.set(payload)
                 else:
-                    future, done = payload
+                    future, done, on_error = payload
                     self.busy -= 1
                     try:
                         result = future.result()
                         if done:
                             done(result)
                     except Exception as exc:
-                        messagebox.showerror("İşlem tamamlanamadı", str(exc) if isinstance(exc, (ApiError, ValueError)) else "İşlem başarısız. Bağlantıyı ve yerel ayarları kontrol edin.")
+                        if on_error:
+                            on_error(exc)
+                        else:
+                            messagebox.showerror("İşlem tamamlanamadı", str(exc) if isinstance(exc, (ApiError, ValueError)) else "İşlem başarısız. Bağlantıyı ve yerel ayarları kontrol edin.")
         except queue.Empty:
             pass
         self.drain_after = self.root.after(100, self.drain)
@@ -169,6 +180,7 @@ class App:
             self.submit(task, connected)
 
         ttk.Button(frame, text="Buluta bağlan  →", style="Primary.TButton", command=login).pack(fill="x", pady=8)
+        ttk.Button(frame, text=f'Sürüm {VERSION} · Güncellemeleri kontrol et', command=self.check_updates).pack(fill='x', pady=4)
         entries[1].bind("<Return>", lambda _: login())
         ttk.Label(frame, textvariable=self.status, style="Sub.TLabel").pack(anchor="w", pady=8)
 
@@ -187,7 +199,8 @@ class App:
 
     def start_connector(self):
         save_settings(self.preferences, self.secrets)
-        config = dict(self.preferences, gateway_token=self.secrets["gateway_token"], device_passwords=self.secrets.get("device_passwords", {}), device_settings=self.secrets.get("device_settings", {}), timezone="Europe/Istanbul")
+        scope = hashlib.sha256(self.client.base_url.encode()).hexdigest()[:12]
+        config = dict(self.preferences, gateway_token=self.secrets["gateway_token"], device_passwords=self.secrets.get("device_passwords", {}), device_settings=self.secrets.get("device_settings", {}), timezone="Europe/Istanbul", attendance_cache=str(config_path().parent / scope / 'attendance-cache.sqlite'))
         self.connector = Connector(config, allow_local=self.allow_local, status=lambda s: self.events.put(("status", s)))
         threading.Thread(target=self.connector.run, daemon=True, name="LAN connector").start()
 
@@ -215,6 +228,7 @@ class App:
         ttk.Label(top, text="◉  parmakizi", style="Title.TLabel").pack(side="left")
         ttk.Button(top, text="Oturumu kapat", command=self.logout).pack(side="right")
         ttk.Button(top, text="Yenile", command=self.refresh).pack(side="right", padx=8)
+        ttk.Button(top, text=f'Güncellemeler · {VERSION}', command=self.check_updates).pack(side='right')
         self.summary = tk.StringVar()
         ttk.Label(self.shell, textvariable=self.summary, style="Sub.TLabel").pack(anchor="w", pady=(12, 16))
         self.notebook = ttk.Notebook(self.shell)
@@ -229,11 +243,13 @@ class App:
         for label, command in [("+ Cihaz ekle", self.add_device), ("Ağda keşfet", self.scan), ("Cihaz bilgisi", lambda: self.job("device.info")), ("Personel oku", lambda: self.job("users.read")), ("Geçişleri oku", lambda: self.job("attendance.read")), ("Personel yaz", self.write_user), ("İletişim ayarı", self.device_secret)]:
             ttk.Button(toolbar, text=label, command=command).pack(side="left", padx=(0, 4))
         ttk.Label(tabs[0], text="Önce bir cihaz seçin. Simülatör kayıtları gerçek cihaz verisi değildir.", style="Sub.TLabel").pack(anchor="w", pady=(10, 0))
-        self.devices = self.table(tabs[0], ("Cihaz", "Marka / model", "IP : port", "Protokol", "Bağlantı noktası", "Son başarılı işlem", "Son hata"))
+        self.devices = self.table(tabs[0], ("Cihaz", "Marka / model", "IP : port", "Protokol", "Bağlantı noktası", "Son başarılı işlem", "Son hata", 'Otomatik aktarım', 'Son aktarım'))
         device_tools = ttk.Frame(tabs[0])
         device_tools.pack(fill='x')
         ttk.Button(device_tools, text='Seçili cihazı düzenle', command=self.edit_device).pack(side='left')
         ttk.Button(device_tools, text='Seçili cihazı buluttan kaldır', command=self.remove_device).pack(side='left', padx=8)
+        ttk.Button(device_tools, text='Otomatik aktarım', command=self.sync_settings).pack(side='left', padx=4)
+        ttk.Button(device_tools, text='Uzaktan cihaz ayarları', command=self.remote_settings).pack(side='left', padx=4)
         self.users = self.table(tabs[1], ("UID", "Sicil", "Ad soyad", "Kart", "Cihaz yetkisi", "Son okuma"))
         self.attendance = self.table(tabs[2], ("Sicil", "Cihaz zamanı", "Saat dilimi", "UTC", "Durum", "Geçiş"))
         self.record_label = tk.StringVar(value="Cihazlar sekmesinde bir cihaz seçip kayıtları yükleyin.")
@@ -267,7 +283,8 @@ class App:
         for tree in (self.devices, self.jobs, self.gateways):
             tree.delete(*tree.get_children())
         for d in data["devices"]:
-            self.devices.insert("", "end", iid=d["id"], values=(d["name"], d["brand"] + " " + d["model"], f'{d["ip"]}:{d["port"]}', d["driver"], d["gateway_name"], d["last_contact"] or "Henüz yok", d["last_error"] or "—"))
+            automatic = f'{d.get("sync_interval_seconds", 60)} sn' if d.get('sync_enabled') else 'Kapalı'
+            self.devices.insert("", "end", iid=d["id"], values=(d["name"], d["brand"] + " " + d["model"], f'{d["ip"]}:{d["port"]}', d["driver"], d["gateway_name"], d["last_contact"] or "Henüz yok", d["last_error"] or "—", automatic, d.get('last_sync_at') or 'Henüz yok'))
         if selected and self.devices.exists(selected[0]):
             self.devices.selection_set(selected)
         for j in data["jobs"]:
@@ -341,8 +358,46 @@ class App:
         def send(values):
             values["gatewayId"] = choices[values.pop("gateway")]
             values["port"] = int(values["port"])
+            values['syncEnabled'] = True
             self.submit(lambda: self.client.request("/api/devices", values), lambda _: self.refresh())
-        self.form("Cihaz ekle", [("name", "Cihaz adı", ""), ("brand", "Marka", "ZKTeco"), ("model", "Model", ""), ("ip", "Yerel IPv4 adresi", "192.168.1.201"), ("port", "İletişim portu", "4370"), ("driver", "Protokol (simulator yalnızca demo)", ["zkteco", "simulator"]), ("gateway", "Cihazla aynı ağdaki bilgisayar", list(choices))], send)
+        self.form("Cihaz ekle · otomatik aktarım başlangıçta 60 sn", [("name", "Cihaz adı", ""), ("brand", "Marka", ['Perkotek', 'ZKTeco', 'Diğer / OEM']), ("model", "Model", ""), ("ip", "Yerel IPv4 adresi", "192.168.1.201"), ("port", "İletişim portu", "4370"), ("driver", "Protokol (Perkotek için ZK uyumu doğrulanmalı)", ["zkteco", "simulator"]), ("gateway", "Cihazla aynı ağdaki bilgisayar", list(choices))], send)
+
+    def sync_settings(self):
+        device = self.selected_device()
+        if not device:
+            return
+        states = ['Etkin', 'Kapalı'] if device.get('sync_enabled') else ['Kapalı', 'Etkin']
+        def send(values):
+            interval = int(values['interval'])
+            if not 30 <= interval <= 86400:
+                raise ValueError('Aktarım aralığı 30–86400 saniye olmalı.')
+            self.submit(lambda: self.client.request(f'/api/devices/{device["id"]}/sync', {'enabled': values['enabled'] == 'Etkin', 'intervalSeconds': interval}, method='PATCH'), lambda _: self.refresh())
+        self.form('Otomatik geçiş aktarımı · bağlantı bilgisayarı açık olmalı', [('enabled', 'Durum', states), ('interval', 'Aktarım aralığı (saniye)', device.get('sync_interval_seconds', 60))], send)
+
+    def remote_settings(self):
+        device = self.selected_device()
+        if not device:
+            return
+        dialog = tk.Toplevel(self.root)
+        dialog.title('Uzaktan cihaz ayarları · ' + device['name'])
+        dialog.transient(self.root)
+        frame = ttk.Frame(dialog, padding=24)
+        frame.pack(fill='both', expand=True)
+        ttk.Label(frame, text='Son okunan ayarlar · yeniden okumak için düğmeyi kullanın').pack(anchor='w')
+        details = tk.Text(frame, width=75, height=14, wrap='word')
+        details.insert('1.0', json.dumps(json.loads(device.get('settings', '{}')), ensure_ascii=False, indent=2))
+        details.configure(state='disabled')
+        details.pack(pady=12)
+        def command(kind):
+            if kind == 'device.time.sync' and not messagebox.askyesno('Cihaz saatini eşitle', 'Cihazın saati bulut zamanı ve yerel iletişim ayarındaki saat dilimine göre değiştirilsin mi?', parent=dialog):
+                return
+            if kind == 'device.restart' and not messagebox.askyesno('Cihazı yeniden başlat', 'Terminal kısa süreliğine devre dışı kalabilir. Yeniden başlatma komutu gönderilsin mi?', parent=dialog):
+                return
+            self.enqueue({'type': kind, 'deviceId': device['id']})
+            dialog.destroy()
+        for label, kind in [('Saat / ağ / kapasite bilgilerini oku', 'device.settings.read'), ('Cihaz saatini bulutla eşitle', 'device.time.sync'), ('Cihazı yeniden başlat', 'device.restart')]:
+            ttk.Button(frame, text=label, command=lambda k=kind: command(k)).pack(fill='x', pady=3)
+        ttk.Label(frame, text='Sonuç İşlemler sekmesinde görünür. IP/ağ maskesi değiştirme bu protokol sürümünde yoktur.', style='Sub.TLabel').pack(anchor='w', pady=10)
 
     def scan(self):
         if not self.preferences.get("gateway_id"):
@@ -396,7 +451,9 @@ class App:
             if not 0 <= number <= 4294967295:
                 raise ValueError('Şifre 0–4294967295 arasında olmalı.')
             settings = self.secrets.setdefault('device_settings', {})
-            settings[key] = {'password': number, 'force_udp': v['transport'] == 'Yalnızca UDP', 'encoding': v['encoding']}
+            from zoneinfo import ZoneInfo
+            ZoneInfo(v['timezone'])
+            settings[key] = {'password': number, 'force_udp': v['transport'] == 'Yalnızca UDP', 'encoding': v['encoding'], 'timezone': v['timezone']}
             save_settings(self.preferences, self.secrets)
             if self.connector:
                 self.connector.zk.config['device_settings'] = dict(settings)
@@ -405,7 +462,64 @@ class App:
             transport.reverse()
         encodings = ['utf-8', 'cp1254', 'latin-1', 'gbk']
         encodings.sort(key=lambda x: x != options.get('encoding', 'utf-8'))
-        self.form('Yerel cihaz iletişimi · buluta gönderilmez', [('password', 'ZK iletişim şifresi', options.get('password', 0)), ('transport', 'Bağlantı türü', transport), ('encoding', 'Cihaz karakter kodlaması', encodings)], save)
+        self.form('Yerel cihaz iletişimi · buluta gönderilmez', [('password', 'ZK iletişim şifresi', options.get('password', 0)), ('transport', 'Bağlantı türü', transport), ('encoding', 'Cihaz karakter kodlaması', encodings), ('timezone', 'Cihaz saat dilimi (IANA)', options.get('timezone', 'Europe/Istanbul'))], save)
+
+    def check_updates(self, manual=True):
+        if self.update_after:
+            self.root.after_cancel(self.update_after)
+        self.update_after = None
+        if self.closed or self.updating or self.update_checking:
+            return
+        if manual and not getattr(sys, 'frozen', False):
+            return messagebox.showinfo('Kaynak sürümü', 'Klasör içi güncelleme Windows EXE paketinde kullanılabilir.')
+        if not getattr(sys, 'frozen', False):
+            return
+        self.update_checking = True
+        origin = self.client.base_url if self.client else self.preferences.get('cloud_url', default_url())
+        client = UpdateClient(origin, token=None if self.client else self.secrets.get('gateway_token'), auth_client=self.client, allow_local=self.allow_local)
+        def task():
+            try:
+                return client.latest()
+            except Exception:
+                if manual:
+                    raise
+                return None
+        def checked(envelope):
+            self.update_checking = False
+            if not envelope:
+                if manual:
+                    messagebox.showinfo('Güncellemeler', f'{VERSION} sürümü güncel; yayımlanmış daha yeni paket yok.')
+                return
+            from gateway.updater import verify_manifest
+            data = verify_manifest(envelope)
+            if not self.client and not self.secrets.get('gateway_token'):
+                return messagebox.showinfo('Yeni sürüm var', data['version'] + ' sürümü yayımlandı. İndirmek için buluta giriş yapın.')
+            if messagebox.askyesno('Yeni sürüm · ' + data['version'], data.get('notes', '') + '\n\nİmzalı güncelleme indirilip aynı klasöre uygulansın mı? Program yeniden açılır; yerel ayarlar korunur.'):
+                self.updating = True
+                self.status.set('İmzalı güncelleme indiriliyor…')
+                def staged(path):
+                    self.activate_update(path)
+                def failed(error):
+                    self.updating = False
+                    self.status.set('Güncelleme uygulanmadı; mevcut sürüm korunuyor.')
+                    messagebox.showerror('Güncelleme tamamlanamadı', str(error) if isinstance(error, (ApiError, ValueError, OSError)) else 'Paket indirilemedi; mevcut program korunuyor.')
+                self.submit(lambda: stage_update(client, envelope, sys.executable), staged, on_error=failed)
+        def check_failed(error):
+            self.update_checking = False
+            messagebox.showerror('Güncelleme kontrolü başarısız', str(error) if isinstance(error, (ApiError, ValueError)) else 'Güncelleme hizmetine ulaşılamadı.')
+        self.submit(task, checked, on_error=check_failed)
+
+    def activate_update(self, path, attempts=0):
+        if self.closed:
+            return
+        if self.busy or (self.connector and not self.connector.quiesce()):
+            if attempts >= 30:
+                self.updating = False
+                return messagebox.showinfo('İşlem sürüyor', 'Cihaz işlemi bitmediği için program kapatılmadı. İşlem bittikten sonra güncellemeyi tekrar başlatın.')
+            self.update_after = self.root.after(2000, lambda: self.activate_update(path, attempts + 1))
+            return
+        launch_update(path)
+        self.close()
 
     def read_records(self, kind, reset=False):
         device = self.selected_device() if reset else None
@@ -431,7 +545,7 @@ class App:
         self.submit(lambda: self.client.request(path), render)
 
     def render_catalog(self, result):
-        self.catalog_data = result["catalog"]
+        self.catalog_data = result["catalog"] + result.get('models', [])
         self.catalog.delete(*self.catalog.get_children())
         for i, row in enumerate(self.catalog_data):
             status = {"adapter": "Adaptör var · saha testi yok", "research": "Protokol tespiti gerekli", "planned": "Adaptör planlanıyor"}[row["status"]]
@@ -513,7 +627,7 @@ class App:
 
     def close(self):
         self.closed = True
-        for callback in (self.drain_after, self.refresh_after):
+        for callback in (self.drain_after, self.refresh_after, self.update_after):
             if callback:
                 self.root.after_cancel(callback)
         if self.connector:
@@ -526,9 +640,10 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--allow-insecure-local", action="store_true")
     parser.add_argument('--self-test-report', help=argparse.SUPPRESS)
+    parser.add_argument('--update-ack', help=argparse.SUPPRESS)
     args = parser.parse_args()
     if args.self_test_report:
-        report = {'ok': False}
+        report = {'ok': False, 'version': VERSION}
         app = None
         try:
             root = tk.Tk()
@@ -540,6 +655,8 @@ def main():
             if not endpoint:
                 raise ValueError('Packaged default endpoint missing')
             report['default_endpoint'] = endpoint
+            from gateway.updater import public_key_bytes
+            report['public_key_sha256'] = hashlib.sha256(public_key_bytes()).hexdigest()
             client = CloudClient(endpoint)
             report['health'] = client.request('/api/health')
             if report['health'].get('ok') is not True:
@@ -567,6 +684,10 @@ def main():
         raise SystemExit(0 if report['ok'] else 1)
     root = tk.Tk()
     App(root, args.allow_insecure_local)
+    if args.update_ack:
+        import os
+        root.update_idletasks()
+        Path(args.update_ack).write_text(json.dumps({'version': VERSION, 'pid': os.getpid()}), encoding='utf-8')
     root.mainloop()
 
 

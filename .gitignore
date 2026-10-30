@@ -10,3 +10,6 @@ __pycache__/
 gateway/config.json
 gateway/*state.json
 *.log
+public/updates/files/*.exe
+build/
+*.spec

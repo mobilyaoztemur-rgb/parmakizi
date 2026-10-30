@@ -29,6 +29,7 @@ jobs:
         with:
           python-version: '3.12'
       - run: npm ci
+      - run: pip install -r gateway/requirements.txt
       - name: Check deployment configuration
         shell: bash
         run: |
@@ -37,6 +38,8 @@ jobs:
           python -c "import os; assert len(os.environ.get('ADMIN_PASSWORD','')) >= 12 and len(os.environ.get('SESSION_SECRET','')) >= 32, 'Set production secrets ADMIN_PASSWORD (12+ chars), SESSION_SECRET (32+ random chars)'"
       - name: Find or create D1 and bind it
         run: python scripts/prepare_cloud.py
+      - name: Retain current signed Windows update assets
+        run: python scripts/prepare_updates.py
       - run: npm run build
       - run: npm run db:remote
       - run: npx --no-install wrangler deploy

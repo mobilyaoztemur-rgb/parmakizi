@@ -189,6 +189,64 @@ class ApiTests(unittest.TestCase):
         device = next(d for d in self.admin.request('/api/overview')['devices'] if d['id'] == self.device['id'])
         self.assertEqual(device['ip'], '192.168.1.201')
 
+    def test_automatic_sync_schedules_once_and_can_be_disabled(self):
+        route = '/api/devices/' + self.device['id'] + '/sync'
+        self.admin.request(route, {'enabled': True, 'intervalSeconds': 30}, method='PATCH')
+        job = self.claim()
+        self.assertEqual((job['type'], job['origin']), ('attendance.read', 'scheduled'))
+        self.assertIsNone(self.claim())
+        self.upload(job, final=True, summary={'count': 0})
+        self.assertIsNone(self.claim())
+        device = next(d for d in self.admin.request('/api/overview')['devices'] if d['id'] == self.device['id'])
+        self.assertIsNotNone(device['last_sync_at'])
+        self.admin.request(route, {'enabled': False, 'intervalSeconds': 30}, method='PATCH')
+        self.assertIsNone(self.claim())
+
+    def test_manual_commands_have_priority_over_scheduled_reads(self):
+        self.queue('device.settings.read')
+        self.admin.request('/api/devices/' + self.device['id'] + '/sync', {'enabled': True, 'intervalSeconds': 60}, method='PATCH')
+        job = self.claim()
+        self.assertEqual(job['type'], 'device.settings.read')
+        self.upload(job, final=True, summary={'deviceTime': '2026-10-30T09:00:00'})
+        self.assertEqual(self.claim()['type'], 'attendance.read')
+
+    def test_remote_clock_sync_and_restart_have_safe_write_outcomes(self):
+        connector = Connector({'cloud_url': BASE, 'gateway_token': self.gateway['token'], 'allowed_subnets': ['192.168.1.0/24']}, allow_local=True)
+        queued = self.queue('device.time.sync')
+        connector.run(once=True)
+        job = next(j for j in self.admin.request('/api/overview')['jobs'] if j['id'] == queued['id'])
+        self.assertEqual(job['status'], 'succeeded')
+        self.assertTrue(json.loads(job['result'])['verified'])
+        self.queue('device.restart')
+        restart = self.claim()
+        self.upload(restart, final=True, error='Command response lost')
+        job = next(j for j in self.admin.request('/api/overview')['jobs'] if j['id'] == restart['id'])
+        self.assertEqual(job['status'], 'uncertain')
+
+    def test_published_manifest_is_signed_and_downloads_require_authentication(self):
+        import base64, hashlib
+        from cryptography.hazmat.primitives import serialization
+        from gateway.updater import verify_manifest, UpdateClient
+        settings = dict(line.split('=', 1) for line in Path('.dev.vars').read_text().splitlines() if '=' in line)
+        key = serialization.load_der_private_key(base64.b64decode(json.loads(settings['UPDATES_SIGNING_KEY'])), password=None)
+        public = key.public_key().public_bytes(serialization.Encoding.PEM, serialization.PublicFormat.SubjectPublicKeyInfo)
+        files = []
+        for stem in ('Parmakizi', 'ParmakiziUpdater'):
+            content = ('MZ-local-test-fixture-' + stem).encode()
+            digest = hashlib.sha256(content).hexdigest()
+            files.append({'name': stem + '.exe', 'path': f'/updates/files/{stem}-0.0.1-{digest[:12]}.exe', 'sha256': digest, 'size': len(content)})
+        envelope = self.admin.request('/api/updates/publish', {'version': '0.0.1', 'files': files})
+        self.assertEqual(verify_manifest(envelope, public)['version'], '0.0.1')
+        with self.assertRaises(urllib.error.HTTPError) as ctx:
+            urllib.request.urlopen(BASE + files[0]['path'])
+        self.assertEqual(ctx.exception.code, 401)
+        import tempfile
+        with tempfile.TemporaryDirectory() as folder:
+            UpdateClient(BASE, auth_client=self.admin, public_key=public, allow_local=True).download(envelope, folder)
+            self.assertTrue((Path(folder) / 'Parmakizi.exe').read_bytes().startswith(b'MZ-local-test-fixture'))
+        with self.assertRaises(ValueError):
+            verify_manifest(envelope)  # Production verification key never trusts the local identity.
+
 
 if __name__ == '__main__':
     unittest.main()

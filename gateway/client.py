@@ -7,6 +7,7 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
+from gateway.version import VERSION
 
 
 class NoRedirect(urllib.request.HTTPRedirectHandler):
@@ -37,7 +38,7 @@ class CloudClient:
         if not path.startswith("/api/") or path.startswith("//"):
             raise ValueError("Geçersiz API yolu.")
         payload = json.dumps(data, ensure_ascii=False).encode() if data is not None else None
-        headers = {"Accept": "application/json", "Origin": self.base_url, "User-Agent": "Parmakizi/0.1.0"}
+        headers = {"Accept": "application/json", "Origin": self.base_url, "User-Agent": "Parmakizi/" + VERSION}
         if payload is not None:
             headers["Content-Type"] = "application/json"
         if self.token:

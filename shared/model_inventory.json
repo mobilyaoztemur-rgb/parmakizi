@@ -1,0 +1,772 @@
+[
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 10 500 Parmak İzi PDKS Terminali",
+    "models": "Magic Pass 10 500 Parmak İzi PDKS Terminali",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-10-500-parmak-izi-pdks-terminali-",
+    "evidence": "2026-10-30 resmî ürün sayfası:  50.000 Kayıt Menü Dili: TÜRKÇE ve SESLİ Bağlantı Tipi: RS232 /RS485 /TCP/IP Port Transfer Hız: 9600 / 38400 / 115200 Access Kontrol: Yok Kilit, Turnike Açma: Yok Zili Çaldırma: Var Kart Okuyucu: Yok Otomatik İşlem: Açma, Kapama, Test, "
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 12150 ID Kartlı Şifreli ve Parmak İzli Kapı Açma Cihazı",
+    "models": "Magic Pass 12150 ID Kartlı Şifreli ve Parmak İzli Kapı Açma Cihazı",
+    "status": "research",
+    "protocol": "Model / SDK doğrulaması gerekli",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-12-150-id-kartli-sifreli-ve-parmak-izli-kapi-acma-cihazi",
+    "evidence": "2026-10-30 resmî ürün sayfası: Ürün sayfası okundu; TCP/IP komut protokolü bu sayfadan doğrulanamadı."
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 12 300 ID Parmak İzli ve Kartlı Geçiş Kontrol Sistemi",
+    "models": "Magic Pass 12 300 ID Parmak İzli ve Kartlı Geçiş Kontrol Sistemi",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-12-300-id-parmak-izli-ve-kartli-gecis-kontrol-sistemi",
+    "evidence": "2026-10-30 resmî ürün sayfası: nik kilit, kapı sensörü, alarm, çıkış butonu Bağlantı Tipi: RS232-485/TCP-IP/ USB MEMORY DISK Port Hızı: 9600 / 38400 / 115200 Kart Okuyucu: Proximity kart okuyucu Otomatik işlem: Açma, Kapama, Test, Uyku Sesli Uyarı: Var RIS: Var. RIS "
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 12 400 ID Parmak İzli ve Kartlı Geçiş Kontrol Sistemi",
+    "models": "Magic Pass 12 400 ID Parmak İzli ve Kartlı Geçiş Kontrol Sistemi",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-12-400-id-parmak-izli-ve-kartli-gecis-kontrol-sistemi",
+    "evidence": "2026-10-30 resmî ürün sayfası: nik kilit, kapı sensörü, alarm, çıkış butonu Bağlantı Tipi: RS232-485/TCP-IP/ USB MEMORY DISK Port Hızı: 9600 / 38400 / 115200 Kart Okuyucu: Proximity kart okuyucu Otomatik İşlem: Açma, Kapama, Test, Uyku Sesli Uyarı: Var RIS: Var. RIS "
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 12.610 ID Parmak izli ve Kartlı Terminal",
+    "models": "Magic Pass 12.610 ID Parmak izli ve Kartlı Terminal",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-12-610-id-parmak-izli-ve-kartli-terminal-",
+    "evidence": "2026-10-30 resmî ürün sayfası: 0 kayıt Menü Dili: Türkçe veya İngilizce Bağlantı Tipi: RS232 /RS485 /TCP/IP/USB MEMORY DISK Port Transfer Hızı: 9600 / 38400 / 115200 USB Çıkışı: USB çıkışı sayesinde datalar USB memory flash diske aktarılarak taşınabilir. Tetik: T urn"
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 12.610 Parmak izi Terminali",
+    "models": "Magic Pass 12.610 Parmak izi Terminali",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-12-610-parmak-izi-terminali",
+    "evidence": "2026-10-30 resmî ürün sayfası: 0 kayıt Menü Dili: Türkçe veya İngilizce Bağlantı Tipi: RS232 /RS485 /TCP/IP/USB MEMORY DISK Port Transfer Hızı: 9600 / 38400 / 115200 USB Çıkışı: USB çıkışı sayesinde datalar USB memory flash diske aktarılarak taşınabilir. Tetik: T urn"
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 12 618 ID Parmak İzli ve Kartlı Personel Takip Okuyucusu",
+    "models": "Magic Pass 12 618 ID Parmak İzli ve Kartlı Personel Takip Okuyucusu",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-12-618-id-parmak-izli-ve-kartli-personel-takip-okuyucusu",
+    "evidence": "2026-10-30 resmî ürün sayfası: 100.000 kayıt Menü Dili: TÜRKÇE ve SESLİ Bağlantı Tipi: RS232 /RS485 /TCP/IP Port Transfer Hızı: 9600 / 38400 / 115200 Zil Çaldırma: Mesai başlangıç, bitiş ve istenilen zamanlarda işletmenin zillerini çaldırarak toplu hareketi sağlar. O"
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 12 618 Parmak İzli PDKS Terminali",
+    "models": "Magic Pass 12 618 Parmak İzli PDKS Terminali",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-12-618-parmak-izli-pdks-terminali",
+    "evidence": "2026-10-30 resmî ürün sayfası: 100.000 kayıt Menü Dili: TÜRKÇE ve SESLİ Bağlantı Tipi: RS232 /RS485 /TCP/IP Port Transfer Hızı: 9600 / 38400 / 115200 Zil Çaldırma: Mesai başlangıç, bitiş ve istenilen zamanlarda işletmenin zillerini çaldırarak toplu hareketi sağlar. O"
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 12 628 ID Parmak İzli ve Proximity Kart",
+    "models": "Magic Pass 12 628 ID Parmak İzli ve Proximity Kart",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-12-628-id-parmak-izli-ve-proximity-kart",
+    "evidence": "2026-10-30 resmî ürün sayfası: 100.000 kayıt Menü Dili: TÜRKÇE ve SESLİ Bağlantı Tipi: RS232 /RS485 /TCP/IP Port Transfer Hızı: 9600 / 38400 / 115200 Kart Okuyucu: Yok Otomatik İşlem: Açma, Kapama, Test, Uyku Sesli Uyarı: Var Ekran Rengi: Mavi Kullanıcı Adı Gösterme:"
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 12 628 MF Parmak İzli ve Mifare Kartlı PDKS Okuyucusu",
+    "models": "Magic Pass 12 628 MF Parmak İzli ve Mifare Kartlı PDKS Okuyucusu",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-12-628-mf-parmak-izli-ve-mifare-kartli-pdks-okuyucusu",
+    "evidence": "2026-10-30 resmî ürün sayfası: 100.000 kayıt Menü Dili: TÜRKÇE ve SESLİ Bağlantı Tipi: RS232 /RS485 /TCP/IP Port Transfer Hızı: 9600 / 38400 / 115200 Kart Okuyucu: Yok Otomatik İşlem: Açma, Kapama, Test, Uyku Sesli Uyarı: Var Ekran Rengi: Mavi Kullanıcı Adı Gösterme:"
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 12 628 Parmak İzi PDKS Terminali",
+    "models": "Magic Pass 12 628 Parmak İzi PDKS Terminali",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-12-628-parmak-izi-pdks-terminali",
+    "evidence": "2026-10-30 resmî ürün sayfası: 100.000 kayıt Menü Dili: TÜRKÇE ve SESLİ Bağlantı Tipi: RS232 /RS485 /TCP/IP Port Transfer Hızı: 9600 / 38400 / 115200 Kart Okuyucu: Yok Otomatik İşlem: Açma, Kapama, Test, Uyku Sesli Uyarı: Var Ekran Rengi: Mavi Kullanıcı Adı Gösterme:"
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 12 658 ID Parmak İzli ve Proximity Kartlı Personel Takip Okuyucusu",
+    "models": "Magic Pass 12 658 ID Parmak İzli ve Proximity Kartlı Personel Takip Okuyucusu",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-12-658-id-parmak-izli-ve-proximity-kartli-personel-takip-okuyucusu",
+    "evidence": "2026-10-30 resmî ürün sayfası: 100.000 kayıt Menü Dili: TÜRKÇE ve SESLİ Bağlantı Tipi: RS232 /RS485 /TCP/IP Port Transfer Hızı: 9600 / 38400 / 115200 Tetik: Opsiyonel: Kapı, turnike ve bariyere tetik verebilir. Otomatik İşlem: Açma, Kapama, Test, Uyku Sesli Uyarı: Va"
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 12 658 MF Parmak İzli ve Mifare Kartlı Personel Takip Okuyucusu",
+    "models": "Magic Pass 12 658 MF Parmak İzli ve Mifare Kartlı Personel Takip Okuyucusu",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-12-658-mf-parmak-izli-ve-mifare-kartli-personel-takip-okuyucusu",
+    "evidence": "2026-10-30 resmî ürün sayfası: 100.000 kayıt Menü Dili: TÜRKÇE ve SESLİ Bağlantı Tipi: RS232 /RS485 /TCP/IP Port Transfer Hızı: 9600 / 38400 / 115200 Tetik: Opsiyonel: Kapı, turnike ve bariyere tetik verebilir. Otomatik İşlem: Açma, Kapama, Test, Uyku Sesli Uyarı: Va"
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 12 658 Parmak İzli PDKS Terminali",
+    "models": "Magic Pass 12 658 Parmak İzli PDKS Terminali",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-12-658-parmak-izli-pdks-terminali",
+    "evidence": "2026-10-30 resmî ürün sayfası: 100.000 kayıt Menü Dili: TÜRKÇE ve SESLİ Bağlantı Tipi: RS232 /RS485 /TCP/IP Port Transfer Hızı: 9600 / 38400 / 115200 Tetik: Opsiyonel: Kapı, turnike ve bariyere tetik verebilir. Otomatik İşlem: Açma, Kapama, Test, Uyku Sesli Uyarı: Va"
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 12140 ID Parmak izi Kartlı ve Şifreli Kapı Açma Cihazı",
+    "models": "Magic Pass 12140 ID Parmak izi Kartlı ve Şifreli Kapı Açma Cihazı",
+    "status": "research",
+    "protocol": "Model / SDK doğrulaması gerekli",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-12140-id-parmak-izi-kartli-ve-sifreli-kapi-acma-cihazi",
+    "evidence": "2026-10-30 resmî ürün sayfası: Ürün sayfası okundu; TCP/IP komut protokolü bu sayfadan doğrulanamadı."
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 12310 ID Parmak İzli Kartlı ve Şifreli Kapı Açma Cihazı",
+    "models": "Magic Pass 12310 ID Parmak İzli Kartlı ve Şifreli Kapı Açma Cihazı",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-12310-id-parmak-izli-kartli-ve-sifreli-kapi-acma-cihazi",
+    "evidence": "2026-10-30 resmî ürün sayfası: n: Elektronik kilit, kapı sensörü, alarm, çıkış butonu Bağlantı Tipi: TCP-IP/ USB MEMORY DISK Kart Okuyucu: Proximity kart okuyucu Otomatik İşlem: Açma, Kapama, Test, Uyku Sesli Uyarı: Var RIS: Var. RIS (Remote Identification System) Te"
+  },
+  {
+    "brand": "Perkotek",
+    "family": "MAGIC PASS 12370 ID Parmak izli Kapı Kilit Açma Sistemi",
+    "models": "MAGIC PASS 12370 ID Parmak izli Kapı Kilit Açma Sistemi",
+    "status": "research",
+    "protocol": "Model / SDK doğrulaması gerekli",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-12370-id--parmak-izli-kapi-acma-kilit-sistemi",
+    "evidence": "2026-10-30 resmî ürün sayfası: Ürün sayfası okundu; TCP/IP komut protokolü bu sayfadan doğrulanamadı."
+  },
+  {
+    "brand": "Perkotek",
+    "family": "MAGIC PASS 12375 ID Parmak izli ve Kartlı Kapı Kilidi",
+    "models": "MAGIC PASS 12375 ID Parmak izli ve Kartlı Kapı Kilidi",
+    "status": "research",
+    "protocol": "Model / SDK doğrulaması gerekli",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-12375-id-parmak-izli-kapi-kolu-ve-kilit",
+    "evidence": "2026-10-30 resmî ürün sayfası: Ürün sayfası okundu; TCP/IP komut protokolü bu sayfadan doğrulanamadı."
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Parmak İzli Kapı Açma Kilidi",
+    "models": "Parmak İzli Kapı Açma Kilidi",
+    "status": "research",
+    "protocol": "Model / SDK doğrulaması gerekli",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-12380-id-parmak-izi-okuyuculu-kapi-kolu-kilidi",
+    "evidence": "2026-10-30 resmî ürün sayfası: Ürün sayfası okundu; TCP/IP komut protokolü bu sayfadan doğrulanamadı."
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 12420 ID Parmak İzli ve Kartlı Geçiş Kontrol Cihazı",
+    "models": "Magic Pass 12420 ID Parmak İzli ve Kartlı Geçiş Kontrol Cihazı",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-12420-id-parmak-izli-ve-kartli-gecis-kontrol-cihazi",
+    "evidence": "2026-10-30 resmî ürün sayfası: n: Elektronik kilit, kapı sensörü, alarm, çıkış butonu Bağlantı Tipi: TCP-IP/ USB MEMORY DISK Geçiş Kontrol Arayüzü: Wiegand, Input/ Output Kart Okuyucu: Proximity kart okuyucu Otomatik İşlem: Açma, Kapama, Test, Uyku Sesli Uyarı: Var R"
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 12425 ID Parmak izi ve Kartlı Kapı Açma Sistemi",
+    "models": "Magic Pass 12425 ID Parmak izi ve Kartlı Kapı Açma Sistemi",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-12425-id-parmak-izi-ve-kartli-kapi-acma-sistemi",
+    "evidence": "2026-10-30 resmî ürün sayfası: ronik kilit,kapı sensörü, alarm, çıkış butonu Bağlantı Tipi RS232-485/TCP-IP/ USB MEMORY DISK Geçiş kontrol Arayüzü Wiegand, Input/ Output Port Hızı 9600 / 38400 / 115200 Kart Okuyucu Proximity kart okuyucu Otomatik işlem Açma, Kapama, "
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 12425 ID Parmak izli ve Kartlı Kapı Açma Sistemi",
+    "models": "Magic Pass 12425 ID Parmak izli ve Kartlı Kapı Açma Sistemi",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-12425-id-parmak-izli-ve-kartli-kapi-acma-sistemi",
+    "evidence": "2026-10-30 resmî ürün sayfası: ik kilit, kapı sensörü, alarm, çıkış butonu Bağlantı Tipi : RS232-485/TCP-IP/ USB MEMORY DISK Geçiş Kontrol Arayüzü: Wiegand, Input/ Output Port Hızı: 9600 / 38400 / 115200 Kart Okuyucu: Proximity kart okuyucu Otomatik İşlem: Açma, Kapa"
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 12425 Mifare Parmak izli ve Kartlı Kapı Açma Sistemi.",
+    "models": "Magic Pass 12425 Mifare Parmak izli ve Kartlı Kapı Açma Sistemi.",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-12425-mifare-parmak-izli-ve-kartli-kapi-acma-sistemi",
+    "evidence": "2026-10-30 resmî ürün sayfası: ik kilit, kapı sensörü, alarm, çıkış butonu Bağlantı Tipi : RS232-485/TCP-IP/ USB MEMORY DISK Geçiş Kontrol Arayüzü: Wiegand, Input/ Output Port Hızı: 9600 / 38400 / 115200 Kart Okuyucu: Mifare kart okuyucu Otomatik İşlem: Açma, Kapama,"
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 12450 ID Parmak İzli ve Kartlı Geçiş Kontrol Cihazı",
+    "models": "Magic Pass 12450 ID Parmak İzli ve Kartlı Geçiş Kontrol Cihazı",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-12450-id-parmak-izli-ve-kartli-gecis-kontrol-cihazi",
+    "evidence": "2026-10-30 resmî ürün sayfası: e turnikelere de tetik verebilirsiniz. Bilgisayar ile RS 232, RS 485, TCP-IP ve USB Memory Disk üzerinden bağlantı kurabilmektedir. 100.000 log kayıt kapasitesine sahip olan bu cihaz, yaklaşık olarak 1 kg. ağırlıktadır. MAGIC PASS 12450"
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 12450 ID Siyah Personel takip sistemi.",
+    "models": "Magic Pass 12450 ID Siyah Personel takip sistemi.",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-12450-id-siyah-personel-takip-sistemi",
+    "evidence": "2026-10-30 resmî ürün sayfası: tion Elektronik kilit,kapı sensörü, alarm, çıkış butonu Bağlantı Tipi TCP-IP/ USB MEMORY DISK Geçiş kontrol Arayüzü Wiegand, Input/ Output Kart Okuyucu Proximity kart okuyucu Otomatik işlem Açma, Kapama, Test, Uyku Sesli Uyarı Var Çalış"
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 12450 MF Parmak izi ve Mifare Kartlı Geçiş Kontrol Cihazı.",
+    "models": "Magic Pass 12450 MF Parmak izi ve Mifare Kartlı Geçiş Kontrol Cihazı.",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-12450-mf-parmak-izli-ve-mifare-kartli-gecis-kontrol-cihazi",
+    "evidence": "2026-10-30 resmî ürün sayfası: onik kilit,kapı sensörü, alarm, çıkış butonu Bağlantı Tipi: RS232-485/TCP-IP/ USB MEMORY DISK Geçiş Kontrol Arayüzü: Wiegand, Input/ Output Port Hızı: 9600 / 38400 / 115200 Kart Okuyucu: Proximity kart okuyucu Otomatik İşlem: Açma, Kapa"
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 12500 ID Parmak izi kapı açma cihazı",
+    "models": "Magic Pass 12500 ID Parmak izi kapı açma cihazı",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-12500-id-parmak-izi-kapi-acma-cihazi",
+    "evidence": "2026-10-30 resmî ürün sayfası: ktronik kilit, kapı sensörü, alarm, çıkış butonu Bağlantı Tipi: RS485/TCP-IP/ USB MEMORY DISK Geçiş Kontrol Arayüzü: Wiegand, Input/ Output Port Hızı: 9600 / 38400 / 115200 Okuyucu: Proximity kart okuyucu ve p armak izi okuyucu Otomatik"
+  },
+  {
+    "brand": "Perkotek",
+    "family": "MAGIC PASS 12500 Mifare Parmak İzi Okuma Kapı Kilit Açma Sistemi.",
+    "models": "MAGIC PASS 12500 Mifare Parmak İzi Okuma Kapı Kilit Açma Sistemi.",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-12500-mifare-parmak-izi-kapi-kilit-acma-sistemi",
+    "evidence": "2026-10-30 resmî ürün sayfası: ktronik kilit, kapı sensörü, alarm, çıkış butonu Bağlantı Tipi: RS485/TCP-IP/ USB MEMORY DISK Geçiş Kontrol Arayüzü: Wiegand, Input/ Output Port Hızı: 9600 / 38400 / 115200 Okuyucu: Mifare kart okuyucu ve p armak izi okuyucu Otomatik İş"
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 12525 ID Parmak izi okuyucu",
+    "models": "Magic Pass 12525 ID Parmak izi okuyucu",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-12525-id-parmak-izi-kapi-actirma-okuyucu",
+    "evidence": "2026-10-30 resmî ürün sayfası: Parmak İzi Okuma Sistemi | Parmak İzi Okuyucu | Tcp/Ip Network - Perko Firma Profili Başarı Hikayeleri Neden Biz ? Markalar & Distribütörlükler İnsan Kaynakları Bayi Girişi Bayilik Başvurusu Ürün Yazılımları Kullan"
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 12550 ID Parmak izi Okuyucu Sistemi",
+    "models": "Magic Pass 12550 ID Parmak izi Okuyucu Sistemi",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-12550-id-parmak-izi-kapi-acma-okuyucu-sistemi",
+    "evidence": "2026-10-30 resmî ürün sayfası:  Renkli 2,4 TFT ekran Bağlantı Tipleri: USB Memory disk, RS232/RS485, TCP/IP bağlantısı yapabilir. Standart Özellikleri: Proximity Kart okuma (orijinal kendi standardındaki kartlar),Otomatik Status sorgulama, DST, Self Sorgu ve Kod özel"
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 12600 Parmak izli PDKS okuyucusu",
+    "models": "Magic Pass 12600 Parmak izli PDKS okuyucusu",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-12600-parmak-izli-pdks-okuyucusu",
+    "evidence": "2026-10-30 resmî ürün sayfası: 0 Kayıt Menü Dili: Türkçe veya İngilizce Bağlantı Tipi: RS232 /RS485 /TCP/IP/USB MEMORY DISK Port Transfer Hızı: 9600 / 38400 / 115200 USB çıkışı: USB çıkışı sayesinde datalar USB memory flash diske aktarılarak taşınabilir. Otomatik işl"
+  },
+  {
+    "brand": "Perkotek",
+    "family": "MAGIC PASS 12625 ID Parmak İzi Okuyucu .",
+    "models": "MAGIC PASS 12625 ID Parmak İzi Okuyucu .",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-12625-id-parmak-izi-okuyucu",
+    "evidence": "2026-10-30 resmî ürün sayfası: lemcisi: 320 MHz işlemciye sahiptir. Bilgisayar Bağlantısı Şekilleri: TCP/IP - USB host - USB slave - 2x relay - wiegand in & out Standart Özellikleri: Anti-passback - 255 Time Zone - Multi-identification Duress mode Sesli Komut Özelliğ"
+  },
+  {
+    "brand": "Perkotek",
+    "family": "MAGIC PASS 12625 ID WI-FI Parmak İzi Okuyucu",
+    "models": "MAGIC PASS 12625 ID WI-FI Parmak İzi Okuyucu",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-12625-id-wifi-parmak-izi-okuyucu",
+    "evidence": "2026-10-30 resmî ürün sayfası: Hatalı Reddetmesi: <0.0001% İşlemcisi: 320MHz işlemci Bağlantı Şekli: TCP/IP, USB host, USB slave, 2x relay, wiegand in & out Standart Özellikleri: 255 Time Zone, Multi-identification Duress mode, Anti-passback Sesli Komut: 16-bit Hi-Fi"
+  },
+  {
+    "brand": "Perkotek",
+    "family": "MAGIC PASS 12625 Mifare wifi Parmak İzi Okuyucu.",
+    "models": "MAGIC PASS 12625 Mifare wifi Parmak İzi Okuyucu.",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-12625-mifare-wifi-parmak-izi-okuyucu",
+    "evidence": "2026-10-30 resmî ürün sayfası: Hatalı Reddetmesi: <0.0001% İşlemcisi: 320MHz işlemci Bağlantı Şekli: TCP/IP, USB host, USB slave, 2x relay, wiegand in & out Standart Özellikleri: 255 Time Zone, Multi-identification Duress mode, Anti-passback Sesli Komut: 16-bit Hi-Fi"
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 14 500 ID Parmak İzli ve Proximit Kartlı Personel Takip Sistemi",
+    "models": "Magic Pass 14 500 ID Parmak İzli ve Proximit Kartlı Personel Takip Sistemi",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-14-500-id-parmak-izli-ve-proximit-kartli-personel-takip-sistemi",
+    "evidence": "2026-10-30 resmî ürün sayfası: 100.000 Kayıt Menü Dili: TÜRKÇE ve SESLİ Bağlantı Tipi: RS232 /RS485 /TCP/IP Port Transfer Hızı: 9600 / 38400 / 115200 Kart Okuyucu: Yok Otomatik İşlem: Açma, Kapama, Test, Uyku Sesli Uyarı: Var Ekran Rengi: Beyaz Kullanıcı Adı Gösterme"
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 14 500 Parmak İzi PDKS Terminali",
+    "models": "Magic Pass 14 500 Parmak İzi PDKS Terminali",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-14-500-parmak-izi-pdks-terminali",
+    "evidence": "2026-10-30 resmî ürün sayfası: 100.000 kayıt Menü Dili: TÜRKÇE ve SESLİ Bağlantı Tipi: RS232 /RS485 /TCP/IP Port Transfer Hızı: 9600 / 38400 / 115200 Kart Okuyucu: Yok Otomatik İşlem: Açma, Kapama, Test, Uyku Sesli Uyarı: Var Ekran Rengi: Beyaz Kullanıcı Adı Gösterme"
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 15 500 ID Parmak İzli ve Proximit Kartlı Personel Takip Okuyucusu",
+    "models": "Magic Pass 15 500 ID Parmak İzli ve Proximit Kartlı Personel Takip Okuyucusu",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-15-500-id-parmak-izli-ve-proximit-kartli-personel-takip-okuyucusu",
+    "evidence": "2026-10-30 resmî ürün sayfası: 100.000 kayıt Menü Dili: TÜRKÇE ve SESLİ Bağlantı Tipi: RS232 /RS485 /TCP/IP Port Transfer Hızı: 9600 / 38400 / 115200 Kart Okuyucu: Proximity kart okuyucu Otomatik İşlem: Açma, Kapama, Test, Uyku Sesli Uyarı: Var Ekran Rengi: Beyaz Kul"
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 15 500 Parmak İzi personel takip sistemi",
+    "models": "Magic Pass 15 500 Parmak İzi personel takip sistemi",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-15-500-parmak-izi-personel-takip-sistemi",
+    "evidence": "2026-10-30 resmî ürün sayfası: 100.000 kayıt Menü Dili: TÜRKÇE ve SESLİ Bağlantı Tipi: RS232 /RS485 /TCP/IP Port Transfer Hızı: 9600 / 38400 / 115200 Kart Okuyucu: Yok Otomatik İşlem: Açma, Kapama, Test, Uyku Sesli Uyarı: Var Ekran Rengi: Beyaz Kullanıcı Adı Gösterme"
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 16 600 Parmak İzi PDKS Terminali",
+    "models": "Magic Pass 16 600 Parmak İzi PDKS Terminali",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-16-600-parmak-izi-pdks-terminali",
+    "evidence": "2026-10-30 resmî ürün sayfası: 150.000 kayıt Menü Dili: TÜRKÇE ve SESLİ Bağlantı Tipi: RS232 /RS485 /TCP-IP/ USB MEMORY DISK Port Transfer Hızı: 9600 / 38400 / 115200 Kart Okuyucu: Yok Otomatik İşlem: Açma, Kapama, Test, Uyku Sesli Uyarı: Var RIS: Var. RIS (Remote Id"
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 16 500 Parmak İzi Okuyucu",
+    "models": "Magic Pass 16 500 Parmak İzi Okuyucu",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-16500-parmak-izi-okuyucu",
+    "evidence": "2026-10-30 resmî ürün sayfası: 150.000 kayıt Menü Dili: TÜRKÇE ve SESLİ Bağlantı Tipi: RS232 /RS485 /TCP-IP/ USB MEMORY DISK Port Transfer Hızı: 9600 / 38400 / 115200 Kart Okuyucu: Yok Otomatik işlem: Açma, Kapama, Test, Uyku Sesli Uyarı: Var RIS: Var. RIS (Remote Id"
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 17 500 Parmak İzi PDKS Terminali",
+    "models": "Magic Pass 17 500 Parmak İzi PDKS Terminali",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-17-500-parmak-izi-pdks-terminali",
+    "evidence": "2026-10-30 resmî ürün sayfası: .000 Kayıt Menü Dili: İNGİLİZCE ve SESLİ Bağlantı Tipi: RS232 /RS485 /TCP-IP/ USB MEMORY DISK Port Transfer Hızı: 9600 / 38400 / 115200 Kart Okuyucu: Yok Otomatik İşlem: Açma, Kapama, Test, Uyku Sesli Uyarı: Var RIS: Var. RIS (Remote Id"
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 17000 Parmak İzi PDKS Sistemi",
+    "models": "Magic Pass 17000 Parmak İzi PDKS Sistemi",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-17000-parmak-izi-pdks-sistemi",
+    "evidence": "2026-10-30 resmî ürün sayfası: .000 kayıt Menü Dili: İNGİLİZCE ve SESLİ Bağlantı Tipi: RS232 /RS485 /TCP-IP/ USB MEMORY DISK Port Transfer Hızı: 9600 / 38400 / 115200 Kart Okuyucu: Yok Otomatik İşlem: Açma, Kapama, Test, Uyku Sesli Uyarı: Var RIS: Var. RIS (Remote Id"
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 19500 ID Parmak İzli ve Kartlı PDKS Terminali",
+    "models": "Magic Pass 19500 ID Parmak İzli ve Kartlı PDKS Terminali",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-19500-id-parmak-izli-ve-kartli-pdks-terminali",
+    "evidence": "2026-10-30 resmî ürün sayfası: 200.000 Kayıt Menü Dili: TÜRKÇE ve SESLİ Bağlantı Tipi: RS232 /RS485 /TCP-IP/ USB MEMORY DISK Port Transfer Hızı: 9600 / 38400 / 115200 Kart Okuyucu: Proximity kart okuyucu Otomatik İşlem: Açma, Kapama, Test, Uyku Sesli Uyarı: Var RIS: "
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 19600ID Parmak izi ve kameralı Tanıma Sistemi",
+    "models": "Magic Pass 19600ID Parmak izi ve kameralı Tanıma Sistemi",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-19600id-parmak-izi-ve-kamerali-tanima-sistemi",
+    "evidence": "2026-10-30 resmî ürün sayfası: apasitesi: 300.000 Kayıt Menü Dili: İngilizce ve sesli Bağlantı Tipi: TCP-IP/ USB MEMORY DISK/ WIFI Kamera: 300.000 piksel HD kalite. Led indikatör: Mavi ve yeşil. Otomatik işlem: Açma, Kapama, Test, Uyku,SMS,Dlst Sesli Uyarı: Var RIS: "
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 20150 ID Parmak izi okuma sistemi.",
+    "models": "Magic Pass 20150 ID Parmak izi okuma sistemi.",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-20150-id-parmak-izi-okuma-sistemi",
+    "evidence": "2026-10-30 resmî ürün sayfası: ik kilit, kapı sensörü, alarm, çıkış butonu Bağlantı Tipi: RS232/485, TCP/IP ve USB bağlantı Geçiş Kontrol Arayüzü: Wiegand, Input/ Output Port Hızı: 9600 / 38400 / 115200 Okuyucu: Proximity kart okuyucu ve Parmak izi okuyucu Otomatik İ"
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 20558 ID Parmak İzli ve Kartlı PDKS Okuyucu",
+    "models": "Magic Pass 20558 ID Parmak İzli ve Kartlı PDKS Okuyucu",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-20558-id-parmak-izli-ve-kartli-pdks-okuyucu",
+    "evidence": "2026-10-30 resmî ürün sayfası: g Kapasitesi: 200.000 Kayıt Menü Dili: TÜRKÇE ve SESLİ Bağlantı Tipi: TCP-IP/ USB MEMORY DISK Kart Okuyucu: Proximity kart okuyucu Otomatik İşlem: Açma, Kapama, Test, Uyku Sesli Uyarı: Var RIS: Var. RIS (Remote Identification System) Zi"
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 20650 ID Parmak İzli Personel Takip Sistemi",
+    "models": "Magic Pass 20650 ID Parmak İzli Personel Takip Sistemi",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-20650-id-parmak-izli-personel-takip-sistemi",
+    "evidence": "2026-10-30 resmî ürün sayfası: g Kapasitesi: 200.000 Kayıt Menü Dili: TÜRKÇE ve SESLİ Bağlantı Tipi: TCP-IP/ USB MEMORY DISK Kart Okuyucu: Proximity kart okuyucu Otomatik İşlem: Açma, Kapama, Test, Uyku Sesli Uyarı: Var RIS: Var. RIS (Remote Identification System) Zi"
+  },
+  {
+    "brand": "Perkotek",
+    "family": "6000 Parmak İzi Kapasiteli ve Bataryalı Parmak İzi Okuma Sistemi",
+    "models": "6000 Parmak İzi Kapasiteli ve Bataryalı Parmak İzi Okuma Sistemi",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-20656-id-parmak-izi-personel-takip-cihazi",
+    "evidence": "2026-10-30 resmî ürün sayfası: g Kapasitesi: 160.000 Kayıt Menü Dili: TÜRKÇE ve SESLİ Bağlantı Tipi: TCP-IP/ USB MEMORY DISK, WIFI Kart Okuyucu: Proximity kart okuyucu Otomatik İşlem: Açma, Kapama, Test, Uyku Sesli Uyarı: Var RIS: Var. RIS (Remote Identification Syst"
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 20656 Mf Parmak İzi Okuma Terminali",
+    "models": "Magic Pass 20656 Mf Parmak İzi Okuma Terminali",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-20656-mf-parmak-izi-okuma-terminali",
+    "evidence": "2026-10-30 resmî ürün sayfası: aktadır. Menü Dili: Türkçe ve sesli menü dili bulunur. Bağlantı Tipi: TCP-IP/ USB MEMORY DISK ile bağlantı sağlar. Kart Okuyucu: Mifare kart okuyucu Otomatik işlem: Açma, Kapama, Test, Uyku Sesli Uyarı: Var. RIS: Var. RIS (Remote Identi"
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Çift Parmak izi Okuyuculu Personel Takip Cihazı DUAL.",
+    "models": "Çift Parmak izi Okuyuculu Personel Takip Cihazı DUAL.",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-20657-id-cift-parmak-izi-okuyuculu-cihaz",
+    "evidence": "2026-10-30 resmî ürün sayfası: g Kapasitesi: 150.000 kayıt Menü Dili: TÜRKÇE ve SESLİ Bağlantı Tipi: TCP-IP/ USB MEMORY DISK Kart Okuyucu: Proximity kart okuyucu Otomatik İşlem: Açma, Kapama, Test, Uyku Sesli Uyarı: Var RIS: Var. RIS (Remote Identification System) Zi"
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 20657 MF Çift Parmak İzi Okuyuculu Cihaz",
+    "models": "Magic Pass 20657 MF Çift Parmak İzi Okuyuculu Cihaz",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-20657-mf-cift-parmak-izi-okuma-sistemi",
+    "evidence": "2026-10-30 resmî ürün sayfası: g Kapasitesi: 150.000 kayıt Menü Dili: TÜRKÇE ve SESLİ Bağlantı Tipi: TCP-IP/ USB MEMORY DISK Kart Okuyucu: MIFARE kart okuyucu Otomatik İşlem: Açma, Kapama, Test, Uyku Sesli Uyarı: Var RIS: Var. RIS (Remote Identification System) Zil: "
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 20658 ID Parmak İzli ve Kartlı PDKS Terminali",
+    "models": "Magic Pass 20658 ID Parmak İzli ve Kartlı PDKS Terminali",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-20658-id-parmak-izli-ve-kartli-pdks-terminali",
+    "evidence": "2026-10-30 resmî ürün sayfası: g Kapasitesi: 200.000 Kayıt Menü Dili: TÜRKÇE ve SESLİ Bağlantı Tipi: TCP-IP/ USB MEMORY DISK Kart Okuyucu: Proximity kart okuyucu Otomatik İşlem: Açma, Kapama, Test, Uyku Sesli Uyarı: Var RIS: Var. RIS (Remote Identification System) Zi"
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 20658 IDT Parmak İzli ve Kartlı PDKS Okuyucu",
+    "models": "Magic Pass 20658 IDT Parmak İzli ve Kartlı PDKS Okuyucu",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-20658-idt-parmak-izli-ve-kartli-pdks-okuyucu",
+    "evidence": "2026-10-30 resmî ürün sayfası: g Kapasitesi: 200.000 Kayıt Menü Dili: TÜRKÇE ve SESLİ Bağlantı Tipi: TCP-IP/ USB MEMORY DISK Kart Okuyucu: Proximity kart okuyucu Otomatik İşlem: Açma, Kapama, Test, Uyku Sesli Uyarı: Var RIS: Var. RIS (Remote Identification System) Zi"
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 20660 MF Parmak İzi Proximity ve Mifare Kart Okuyucu",
+    "models": "Magic Pass 20660 MF Parmak İzi Proximity ve Mifare Kart Okuyucu",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-20660-mf-parmak-izi-proximity-ve-mifare-kart-okuyucu",
+    "evidence": "2026-10-30 resmî ürün sayfası: g Kapasitesi: 100.000 Kayıt Menü Dili: TÜRKÇE ve SESLİ Bağlantı Tipi: TCP-IP/ USB MEMORY DISK Kart Okuyucu: Mifare ve Proximity kart okuyucu aynı anda Otomatik İşlem: Açma, Kapama, Test, Uyku Sesli Uyarı: Var RIS: Var. RIS (Remote Ident"
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 20900 ID Parmak İzli ve Kartlı PDKS Terminali",
+    "models": "Magic Pass 20900 ID Parmak İzli ve Kartlı PDKS Terminali",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-20900-id-parmak-izli-ve-kartli-pdks-terminali",
+    "evidence": "2026-10-30 resmî ürün sayfası: ırmak için tetik verebilir. Menü Dili: TÜRKÇE ve SESLİ Bağlantı Tipi: TCP-IP/ USB MEMORY DISK Kart Okuyucu: Proximity kart okuyucu Otomatik İşlem: Açma, Kapama, Test, Uyku Sesli Uyarı: Var RIS: Var. RIS (Remote Identification System) Zi"
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 21.500 ID Parmak izli personel takip sistemi.",
+    "models": "Magic Pass 21.500 ID Parmak izli personel takip sistemi.",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-21-500-id-parmak-izli-personel-takip-sistemi",
+    "evidence": "2026-10-30 resmî ürün sayfası: ddetme: 0,01% Menü Dili: TÜRKÇE ve SESLİ Bağlantı Tipi: RS232 /RS485 /TCP-IP/ USB MEMORY DISK Kart Okuyucu: Proximity kart okuyucu Otomatik İşlem: Açma, Kapama, Test, Uyku Sesli Uyarı: Var RIS: Var. RIS (Remote Identification System) Te"
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 22000 ID Kameralı Parmak izi Okuma Sistemi",
+    "models": "Magic Pass 22000 ID Kameralı Parmak izi Okuma Sistemi",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-22000-id-kamerali-parmak-izi-okuma-sistemi",
+    "evidence": "2026-10-30 resmî ürün sayfası: apasitesi: 300.000 kayıt Menü Dili: İngilizce ve sesli Bağlantı Tipi: TCP-IP, USB Memory disk, Wiegand 26- bit output, WIFI Kamera: 300.000 piksel HD kalite. Led İndikatör: Mavi ve yeşil. Otomatik İşlem: Açma, Kapama, Test, Uyku, SMS, D"
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 5000 Parmak İzi PDKS Terminali, Parmak İzi Okuyucu",
+    "models": "Magic Pass 5000 Parmak İzi PDKS Terminali, Parmak İzi Okuyucu",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-5000-parmak-izi-pdks-terminali-parmak-izi-okuyucu",
+    "evidence": "2026-10-30 resmî ürün sayfası: rkçe ve sesli geri bildirime sahiptir. Bilgisayar bağlantısını RS232, TCP-IP, USB ve RS485 ile sağlamaktadır. Access kontrol özelliği bulunan MAGIC PASS 5000 parmak izi okuyucu, Türkçe ve sesli geri bildirim sağlamaktadır. Sadece parmak"
+  },
+  {
+    "brand": "Perkotek",
+    "family": "MAGIC PASS 5000L Parmak izi kapı kilidi.",
+    "models": "MAGIC PASS 5000L Parmak izi kapı kilidi.",
+    "status": "research",
+    "protocol": "Model / SDK doğrulaması gerekli",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-5000l-parmak-izi-kapi-kilidi",
+    "evidence": "2026-10-30 resmî ürün sayfası: Ürün sayfası okundu; TCP/IP komut protokolü bu sayfadan doğrulanamadı."
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 5500 Parmak İzi okuyucu",
+    "models": "Magic Pass 5500 Parmak İzi okuyucu",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-5500-parmak-izi-okuyucu",
+    "evidence": "2026-10-30 resmî ürün sayfası: si 50.000 Kayıt Menü Dili TÜRKÇE ve SESLİ Bağlantı Tipi RS232 /RS485 /TCP/IP /FLASHDISK Port Transfer Hızı 9600 / 38400 / 115200 Access Kontrol Var Kilit,Turnike Açma Yok Zil Çalma Var Kart Okuyucu Yok Otomatik işlem Açma, Kapama, Test,"
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 6500 Parmak İzi personel takip sistemi",
+    "models": "Magic Pass 6500 Parmak İzi personel takip sistemi",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-6500-parmak-izi-personel-takip-sistemi",
+    "evidence": "2026-10-30 resmî ürün sayfası:  50.000 kayıt Menü Dili: TÜRKÇE ve SESLİ Bağlantı Tipi: RS232 /RS485 /TCP/IP /FLASHDISK Port Transfer Hızı: 9600 / 38400 / 115200 Access Kontrol: Var Kilit, Turnike Açma: Var Tuşla Zili Çaldırma: Var Kart Okuyucu: Yok Otomatik işlem: Aç"
+  },
+  {
+    "brand": "Perkotek",
+    "family": "MAGIC PASS 7000U Parmak izi kapı kilidi.",
+    "models": "MAGIC PASS 7000U Parmak izi kapı kilidi.",
+    "status": "research",
+    "protocol": "Model / SDK doğrulaması gerekli",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-7000u-parmak-izi-kapi-kilidi",
+    "evidence": "2026-10-30 resmî ürün sayfası: Ürün sayfası okundu; TCP/IP komut protokolü bu sayfadan doğrulanamadı."
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 7500 Parmak İzi PDKS Terminali.",
+    "models": "Magic Pass 7500 Parmak İzi PDKS Terminali.",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-7500-parmak-izi-pdks-terminali",
+    "evidence": "2026-10-30 resmî ürün sayfası:  50.000 Kayıt Menü Dili: TÜRKÇE ve SESLİ Bağlantı Tipi: RS232 /RS485 /TCP/IP /FLASHDISK Port Transfer Hızı: 9600 / 38400 / 115200 Access Kontrol: Var Kilit, Turnike Açma: Var Paydos Zili Çaldırma: Var. (Mesai başlangıç ve bitişlerinde z"
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass 9500 Parmak İzi PDKS Terminali",
+    "models": "Magic Pass 9500 Parmak İzi PDKS Terminali",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-9500-parmak-izi-pdks-terminali",
+    "evidence": "2026-10-30 resmî ürün sayfası:  50.000 kayıt Menü Dili: TÜRKÇE ve SESLİ Bağlantı Tipi: RS232 /RS485 /TCP/IP Port Transfer Hız: 9600 / 38400 / 115200 Access Kontrol: Yok Kilit, Turnike Açma: Yok Zili Çaldırma: Var Kart Okuyucu: Yok Otomatik İşlem: Açma, Kapama, Test, "
+  },
+  {
+    "brand": "Perkotek",
+    "family": "MAGICPASS F 9 ID Parmak izi okuyucu",
+    "models": "MAGICPASS F 9 ID Parmak izi okuyucu",
+    "status": "research",
+    "protocol": "Model / SDK doğrulaması gerekli",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-f9-id-parmak-izi-okuyucu",
+    "evidence": "2026-10-30 resmî ürün sayfası: Ürün sayfası okundu; TCP/IP komut protokolü bu sayfadan doğrulanamadı."
+  },
+  {
+    "brand": "Perkotek",
+    "family": "MAGIC PASS FX 6 ID Parmak izi okuyucu",
+    "models": "MAGIC PASS FX 6 ID Parmak izi okuyucu",
+    "status": "research",
+    "protocol": "Model / SDK doğrulaması gerekli",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-fx6-id-parmak-izi-kart-ve-sifre-okuyucu-ip-68-dis-mekan-su-gecirmez-celik",
+    "evidence": "2026-10-30 resmî ürün sayfası: Ürün sayfası okundu; TCP/IP komut protokolü bu sayfadan doğrulanamadı."
+  },
+  {
+    "brand": "Perkotek",
+    "family": "MAGIC PASS FX7 ID Su Geçirmez Parmak izi Okuyucu",
+    "models": "MAGIC PASS FX7 ID Su Geçirmez Parmak izi Okuyucu",
+    "status": "research",
+    "protocol": "Model / SDK doğrulaması gerekli",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-fx7-id-kartli-sifreli-ve-parmak-izi-okuyucu-su-gecirmez-ip68",
+    "evidence": "2026-10-30 resmî ürün sayfası: Ürün sayfası okundu; TCP/IP komut protokolü bu sayfadan doğrulanamadı."
+  },
+  {
+    "brand": "Perkotek",
+    "family": "MAGIC PASS KV15 Kişisel verileri koruma kanunu uyumlu parmak izi okuyucu",
+    "models": "MAGIC PASS KV15 Kişisel verileri koruma kanunu uyumlu parmak izi okuyucu",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-kv15-parmak-izi-okuyucu-kvkk-uyumlu",
+    "evidence": "2026-10-30 resmî ürün sayfası: Tuş Takımı: Var Sıcaklık Sensörü: Var Sesli Uyarı: Var Bağlantı: USB, TCP/IP ve Wi-Fi Wiegand Bağlantı: In ve Out Hatalı Kabul Etme: < 0.00001% Hatalı Reddetme Etme: < 0.00001% Tetik: Turnike, bariyer ve kapı açtırmak için tetik verebil"
+  },
+  {
+    "brand": "Perkotek",
+    "family": "MAGIC PASS MP 12340 Parmak İzi Kapı Kilidi",
+    "models": "MAGIC PASS MP 12340 Parmak İzi Kapı Kilidi",
+    "status": "research",
+    "protocol": "Model / SDK doğrulaması gerekli",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-mp-12340-parmak-izi-kapi-kilidi",
+    "evidence": "2026-10-30 resmî ürün sayfası: Ürün sayfası okundu; TCP/IP komut protokolü bu sayfadan doğrulanamadı."
+  },
+  {
+    "brand": "Perkotek",
+    "family": "MAGIC PASS MP 12360 ID Kartlı Şifreli ve Parmak İzli Kapı Kilidi",
+    "models": "MAGIC PASS MP 12360 ID Kartlı Şifreli ve Parmak İzli Kapı Kilidi",
+    "status": "research",
+    "protocol": "Model / SDK doğrulaması gerekli",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-mp-12360-id-kartli-sifreli-ve-parmak-izli-kapi-kilidi",
+    "evidence": "2026-10-30 resmî ürün sayfası: Ürün sayfası okundu; TCP/IP komut protokolü bu sayfadan doğrulanamadı."
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Magic Pass No Touch Buton",
+    "models": "Magic Pass No Touch Buton",
+    "status": "research",
+    "protocol": "Model / SDK doğrulaması gerekli",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/magic-pass-no-touch-buton",
+    "evidence": "2026-10-30 resmî ürün sayfası: Ürün sayfası okundu; TCP/IP komut protokolü bu sayfadan doğrulanamadı."
+  },
+  {
+    "brand": "Perkotek",
+    "family": "Perkotek P20 Parmak izi Cihazı",
+    "models": "Perkotek P20 Parmak izi Cihazı",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.perkotek.com/perkotek-p20-parmak-izi-personel-takip-cihazi",
+    "evidence": "2026-10-30 resmî ürün sayfası: g Kapasitesi: 160.000 Kayıt Menü Dili: TÜRKÇE ve SESLİ Bağlantı Tipi: TCP-IP/ USB MEMORY DISK, WIFI Kart Okuyucu: Proximity kart okuyucu Otomatik İşlem: Açma, Kapama, Test, Uyku Sesli Uyarı: Var RIS: Var. RIS (Remote Identification Syst"
+  },
+  {
+    "brand": "ZKTeco",
+    "family": "SensePalm T1 & SensePalm T2",
+    "models": "SensePalm T1 & SensePalm T2",
+    "status": "research",
+    "protocol": "Model / SDK doğrulaması gerekli",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.zkteco.com/en/SensePalmSeries/SensePalm_T1_SensePalm_T2",
+    "evidence": "2026-10-30 resmî ürün sayfası: Ürün sayfası okundu; TCP/IP komut protokolü bu sayfadan doğrulanamadı."
+  },
+  {
+    "brand": "ZKTeco",
+    "family": "MB10-VL",
+    "models": "MB10-VL",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.zkteco.com/en/Standalone_Device/MB10-VL",
+    "evidence": "2026-10-30 resmî ürün sayfası: nal:800) Transaction Capacity 50,000 (Optional:150,000) Communication TCP/IP, USB Host, Wi-Fi (Optional) Standard Function ADMS, DST, Self-service Query, Automatic Status Switch, T9 Input, Camera, 9-digit User ID, Multiple Verification "
+  },
+  {
+    "brand": "ZKTeco",
+    "family": "iClock360",
+    "models": "iClock360",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.zkteco.com/en/iClockSeries/iClock360",
+    "evidence": "2026-10-30 resmî ürün sayfası: pandability. Users can easily manage data by networking iClock360 via TCP/IP, and USB host / client(optional). Most importantly, all the functions can still operate in a networking state. iClock360 is compatible with various types of US"
+  },
+  {
+    "brand": "ZKTeco",
+    "family": "iClock680",
+    "models": "iClock680",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.zkteco.com/en/iClockSeries/iClock680",
+    "evidence": "2026-10-30 resmî ürün sayfası: pandability. Users can easily manage data by networking iClock680 via TCP/IP. Most importantly, all the functions can still operate in a networking state. iClock680 is compatible with various types of USB flash disks, ADMS and former SD"
+  },
+  {
+    "brand": "ZKTeco",
+    "family": "iClock700",
+    "models": "iClock700",
+    "status": "research",
+    "protocol": "TCP/IP · SDK belirsiz",
+    "note": "Üretici katalog girdisi; ZK uyumluluğu ve saha desteği doğrulanmış değildir.",
+    "source": "https://www.zkteco.com/en/iClockSeries/iClock700",
+    "evidence": "2026-10-30 resmî ürün sayfası: with various types of USB flash disks, ADMS and former SDK. Moreover, TCP/IP and USB client ensures a smooth date transmission between device and PC. It also has Wi-Fi and 3G/4G connectivity and access control connectivity with Wiegand "
+  }
+]

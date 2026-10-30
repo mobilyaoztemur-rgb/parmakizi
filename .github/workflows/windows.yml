@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     tags: ['v*']
-    paths: ['gateway/**', 'desktop_entry.py', 'tests_desktop/**', '.github/workflows/windows.yml']
+    paths: ['gateway/**', 'desktop_entry.py', 'updater_entry.py', 'tests_desktop/**', 'tests_windows/**', '.github/workflows/windows.yml']
 permissions:
   contents: read
 jobs:
@@ -35,12 +35,23 @@ jobs:
       - name: Test native desktop
         run: python -m unittest discover -s tests_desktop -v
       - name: Build standalone executable
-        run: pyinstaller --noconfirm --clean --onefile --windowed --name Parmakizi --collect-all zk --collect-all tzdata --add-data "gateway/defaults.json;gateway" desktop_entry.py
+        run: |
+          pyinstaller --noconfirm --clean --onefile --windowed --name ParmakiziUpdater --add-data "gateway/update-key.pem;gateway" updater_entry.py
+          pyinstaller --noconfirm --clean --onefile --windowed --name Parmakizi --collect-all zk --collect-all tzdata --add-data "gateway/defaults.json;gateway" --add-data "gateway/update-key.pem;gateway" desktop_entry.py
       - name: Write SHA-256 checksum
         shell: pwsh
         run: |
-          $hash = (Get-FileHash dist/Parmakizi.exe -Algorithm SHA256).Hash.ToLower()
-          "$hash  Parmakizi.exe" | Set-Content -Encoding ascii dist/Parmakizi.exe.sha256
+          foreach ($name in @('Parmakizi.exe', 'ParmakiziUpdater.exe')) {
+            $hash = (Get-FileHash "dist/$name" -Algorithm SHA256).Hash.ToLower()
+            "$hash  $name" | Set-Content -Encoding ascii "dist/$name.sha256"
+          }
+      - name: Verify packaged updater dependencies and public key
+        shell: pwsh
+        run: |
+          $report = Join-Path (Get-Location) 'dist/helper-self-test.json'
+          $helper = Start-Process -FilePath dist/ParmakiziUpdater.exe -ArgumentList @('--self-test-report', ('"{0}"' -f $report)) -PassThru
+          if (-not $helper.WaitForExit(30000)) { Stop-Process -Id $helper.Id -Force; throw 'Updater self-test timed out' }
+          if ($helper.ExitCode -ne 0 -or -not (Get-Content $report -Raw | ConvertFrom-Json).ok) { throw 'Updater self-test failed' }
       - name: Verify the packaged EXE opens and reaches the live API
         shell: pwsh
         run: |
@@ -56,6 +67,11 @@ jobs:
             throw 'Packaged EXE did not verify its UI, cloud connection and credential protection'
           }
           Write-Output 'Packaged Windows EXE: UI startup, HTTPS API, anonymous access rejection and DPAPI passed.'
+      - name: Test Windows installation and rollback against the frozen executable
+        env:
+          TEST_FROZEN_EXE: dist/Parmakizi.exe
+          TEST_FROZEN_UPDATER: dist/ParmakiziUpdater.exe
+        run: python -m unittest discover -s tests_windows -v
       - name: Include source and notices with the internal build
         shell: pwsh
         run: |
@@ -68,8 +84,38 @@ jobs:
           path: |
             dist/Parmakizi.exe
             dist/Parmakizi.exe.sha256
+            dist/ParmakiziUpdater.exe
+            dist/ParmakiziUpdater.exe.sha256
             dist/self-test.json
+            dist/helper-self-test.json
             dist/Parmakizi-source.zip
             dist/THIRD_PARTY_NOTICES.md
             dist/licenses/
           if-no-files-found: error
+  publish-update:
+    if: vars.ENABLE_UPDATE_PUBLISH == 'true'
+    needs: build
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm ci
+      - run: pip install -r gateway/requirements.txt
+      - uses: actions/download-artifact@v4
+        with:
+          name: Parmakizi-Windows-x64
+          path: windows-artifact
+      - run: python scripts/prepare_cloud.py
+      - run: npm run db:remote
+      - run: python scripts/publish_update.py --artifact windows-artifact --notes "Otomatik Windows sürümü"
