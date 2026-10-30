@@ -16,6 +16,17 @@ from gateway.updater import public_key_bytes
 from gateway.version import VERSION
 
 
+def filesystem_retry(operation):
+    deadline = time.monotonic() + 10
+    while True:
+        try:
+            return operation()
+        except PermissionError:
+            if time.monotonic() >= deadline:
+                raise
+            time.sleep(0.2)
+
+
 def wait_for_parent(pid, timeout=60):
     if os.name != 'nt':
         raise OSError('Güncelleyici Windows gerektirir.')
@@ -101,21 +112,21 @@ def install_update(job_path, wait_parent=True, public_key=None, boot_timeout=30)
             if current.is_symlink():
                 raise ValueError('Uygulama dosyası bir bağlantı olamaz.')
             if current.exists():
-                current.replace(backup / name)
+                filesystem_retry(lambda: current.replace(backup / name))
                 moved.append(name)
             temporary = target / ('.' + name + '.installing')
             if temporary.exists():
                 raise ValueError('Önceki bir kurulum dosyası mevcut; değişiklik yapılmadı.')
             temporaries.append(temporary)
             shutil.copyfile(stage / name, temporary)
-            temporary.replace(current)
+            filesystem_retry(lambda: temporary.replace(current))
             installed.append(name)
-        child = subprocess.Popen([str(target / 'Parmakizi.exe'), '--update-ack', str(acknowledgement)], close_fds=True)
+        child = subprocess.Popen([str(target / 'Parmakizi.exe'), '--update-ack', str(acknowledgement)], close_fds=True, env={**os.environ, 'PYINSTALLER_RESET_ENVIRONMENT': '1'})
         deadline = time.monotonic() + boot_timeout
         while time.monotonic() < deadline:
             if acknowledgement.exists():
                 ack = json.loads(acknowledgement.read_text(encoding='utf-8'))
-                if ack.get('version') == data['version'] and ack.get('pid') == child.pid:
+                if ack.get('version') == data['version'] and (ack.get('pid') == child.pid or ack.get('launcher_pid') == child.pid):
                     result_path.write_text(json.dumps({'ok': True, 'version': data['version'], 'pid': child.pid, 'backup': str(backup)}), encoding='utf-8')
                     return True
             if child.poll() is not None:
@@ -124,17 +135,24 @@ def install_update(job_path, wait_parent=True, public_key=None, boot_timeout=30)
         raise RuntimeError('Yeni uygulama açılışını doğrulamadı.')
     except Exception as error:
         if child and child.poll() is None:
-            child.terminate()
+            if os.name == 'nt':
+                subprocess.run(['taskkill', '/PID', str(child.pid), '/T', '/F'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=False)
+            else:
+                child.terminate()
             child.wait(timeout=10)
         for temporary in temporaries:
             temporary.unlink(missing_ok=True)
-        for name in installed:
-            (target / name).unlink(missing_ok=True)
-        for name in moved:
-            (backup / name).replace(target / name)
+        try:
+            for name in installed:
+                filesystem_retry(lambda: (target / name).unlink(missing_ok=True))
+            for name in moved:
+                filesystem_retry(lambda: (backup / name).replace(target / name))
+        except OSError as restore_error:
+            result_path.write_text(json.dumps({'ok': False, 'error_type': type(restore_error).__name__, 'restored': False, 'backup': str(backup)}), encoding='utf-8')
+            return False
         result_path.write_text(json.dumps({'ok': False, 'error_type': type(error).__name__, 'restored': bool(moved)}), encoding='utf-8')
         if (target / 'Parmakizi.exe').exists() and wait_parent:
-            subprocess.Popen([str(target / 'Parmakizi.exe')], close_fds=True)
+            subprocess.Popen([str(target / 'Parmakizi.exe')], close_fds=True, env={**os.environ, 'PYINSTALLER_RESET_ENVIRONMENT': '1'})
         return False
 
 

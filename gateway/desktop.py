@@ -24,7 +24,7 @@ from gateway.connector import Connector, networks
 from gateway.storage import load_settings, save_settings, dpapi
 from gateway.storage import config_path
 from gateway.version import VERSION
-from gateway.updater import UpdateClient, stage_update, launch_update
+from gateway.updater import UpdateClient, stage_update, launch_update, application_launcher_pid
 
 TYPES = {"device.info": "Cihaz bilgisi", "users.read": "Personel oku", "attendance.read": "Geçişleri oku", "users.upsert": "Personel yaz", "discover": "Ağ keşfi", 'device.settings.read': 'Cihaz ayarlarını oku', 'device.time.sync': 'Cihaz saatini eşitle', 'device.restart': 'Cihazı yeniden başlat'}
 STATES = {"queued": "Bekliyor", "running": "Çalışıyor", "succeeded": "Tamamlandı", "failed": "Başarısız", "uncertain": "Cihazdan kontrol edin"}
@@ -711,7 +711,7 @@ def main():
     if args.update_ack:
         import os
         root.update_idletasks()
-        Path(args.update_ack).write_text(json.dumps({'version': VERSION, 'pid': os.getpid()}), encoding='utf-8')
+        Path(args.update_ack).write_text(json.dumps({'version': VERSION, 'pid': os.getpid(), 'launcher_pid': application_launcher_pid()}), encoding='utf-8')
     root.mainloop()
 
 

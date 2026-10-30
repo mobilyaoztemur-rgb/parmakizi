@@ -105,6 +105,16 @@ class InstallationTests(unittest.TestCase):
             result = json.loads((job.parent / 'result.json').read_text())
             self.assertTrue((Path(result['backup']) / 'Parmakizi.exe').read_bytes().startswith(b'old-'))
 
+    def test_onefile_launcher_and_python_child_acknowledgement(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            public, _, job = self.prepare(root)
+            def boot(args, **kwargs):
+                Path(args[-1]).write_text(json.dumps({'version': '0.2.0', 'pid': 43, 'launcher_pid': 42}))
+                return Mock(pid=42)
+            with patch('gateway.update_helper.subprocess.Popen', side_effect=boot):
+                self.assertTrue(apply_update(job, wait_parent=False, public_key=public))
+
     def test_failed_startup_restores_both_executables(self):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)

@@ -8,6 +8,7 @@ import os
 from pathlib import Path
 import re
 import subprocess
+import sys
 import urllib.parse
 import urllib.request
 import uuid
@@ -21,6 +22,32 @@ from gateway.version import VERSION
 
 NAMES = ('Parmakizi.exe', 'ParmakiziUpdater.exe')
 MAX_FILE = 25 * 1024 * 1024
+
+
+def application_launcher_pid():
+    """PyInstaller one-file apps have a launcher and a Python child; wait for both."""
+    if os.name != 'nt' or not getattr(sys, 'frozen', False):
+        return os.getpid()
+    import ctypes
+    from ctypes import wintypes
+    kernel = ctypes.WinDLL('kernel32', use_last_error=True)
+    kernel.OpenProcess.argtypes = [wintypes.DWORD, wintypes.BOOL, wintypes.DWORD]
+    kernel.OpenProcess.restype = wintypes.HANDLE
+    kernel.QueryFullProcessImageNameW.argtypes = [wintypes.HANDLE, wintypes.DWORD, wintypes.LPWSTR, ctypes.POINTER(wintypes.DWORD)]
+    kernel.QueryFullProcessImageNameW.restype = wintypes.BOOL
+    kernel.CloseHandle.argtypes = [wintypes.HANDLE]
+    parent = os.getppid()
+    handle = kernel.OpenProcess(0x1000, False, parent)
+    if not handle:
+        return os.getpid()
+    try:
+        size = wintypes.DWORD(32768)
+        image = ctypes.create_unicode_buffer(size.value)
+        if kernel.QueryFullProcessImageNameW(handle, 0, image, ctypes.byref(size)) and Path(image.value).resolve() == Path(sys.executable).resolve():
+            return parent
+        return os.getpid()
+    finally:
+        kernel.CloseHandle(handle)
 
 
 def version_tuple(value):
@@ -139,7 +166,7 @@ def stage_update(client, envelope, target_executable):
     if stage.parent.is_symlink():
         raise ValueError('Güncelleme klasörü bir bağlantı olamaz.')
     client.download(envelope, stage)
-    job = {'envelope': envelope, 'target_dir': str(target.parent), 'parent_pid': os.getpid(), 'stage_dir': str(stage)}
+    job = {'envelope': envelope, 'target_dir': str(target.parent), 'parent_pid': application_launcher_pid(), 'stage_dir': str(stage)}
     job_path = stage / 'job.json'
     job_path.write_text(json.dumps(job), encoding='utf-8')
     return job_path
@@ -152,4 +179,4 @@ def launch_update(job_path):
     data = verify_manifest(job['envelope'])
     helper = next(f for f in data['files'] if f['name'] == 'ParmakiziUpdater.exe')
     check_file(path.parent / helper['name'], helper)
-    subprocess.Popen([str(path.parent / helper['name']), '--job', str(path)], close_fds=True)
+    subprocess.Popen([str(path.parent / helper['name']), '--job', str(path)], close_fds=True, env={**os.environ, 'PYINSTALLER_RESET_ENVIRONMENT': '1'})
