@@ -13,7 +13,7 @@ import urllib.error
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from gateway.client import CloudClient
-from gateway.updater import MAX_FILE, NAMES, verify_manifest, version_tuple
+from gateway.updater import MAX_FILE, NAMES, verify_manifest, version_tuple, public_key_fingerprint
 from scripts.prepare_updates import main as retain_updates
 
 
@@ -42,7 +42,7 @@ def main():
         target = f'/updates/files/{name[:-4]}-{version}-{digest[:12]}.exe'
         files.append({'name': name, 'path': target, 'sha256': digest, 'size': len(content)})
     report = json.loads((source / 'self-test.json').read_text(encoding='utf-8'))
-    fingerprint = hashlib.sha256(Path('gateway/update-key.pem').read_bytes()).hexdigest()
+    fingerprint = public_key_fingerprint()
     if report.get('ok') is not True or report.get('windows_dpapi') is not True or report.get('version') != version or report.get('public_key_sha256') != fingerprint or report.get('default_endpoint') != origin:
         raise SystemExit('Başarılı Windows EXE kontrol raporu gerekli.')
     helper_report = json.loads((source / 'helper-self-test.json').read_text(encoding='utf-8'))

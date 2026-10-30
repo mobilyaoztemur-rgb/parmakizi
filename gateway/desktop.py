@@ -679,8 +679,8 @@ def main():
             if not endpoint:
                 raise ValueError('Packaged default endpoint missing')
             report['default_endpoint'] = endpoint
-            from gateway.updater import public_key_bytes
-            report['public_key_sha256'] = hashlib.sha256(public_key_bytes()).hexdigest()
+            from gateway.updater import public_key_fingerprint
+            report['public_key_sha256'] = public_key_fingerprint()
             client = CloudClient(endpoint)
             report['health'] = client.request('/api/health')
             if report['health'].get('ok') is not True:

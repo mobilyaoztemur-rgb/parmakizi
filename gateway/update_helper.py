@@ -12,7 +12,7 @@ import time
 import uuid
 
 from gateway.updater import NAMES, check_file, verify_manifest
-from gateway.updater import public_key_bytes
+from gateway.updater import public_key_bytes, public_key_fingerprint
 from gateway.version import VERSION
 
 
@@ -167,7 +167,7 @@ def main():
         import hashlib
         public = public_key_bytes()
         valid = isinstance(serialization.load_pem_public_key(public), Ed25519PublicKey)
-        Path(args.self_test_report).write_text(json.dumps({'ok': valid, 'version': VERSION, 'public_key_sha256': hashlib.sha256(public).hexdigest()}), encoding='utf-8')
+        Path(args.self_test_report).write_text(json.dumps({'ok': valid, 'version': VERSION, 'public_key_sha256': public_key_fingerprint(public)}), encoding='utf-8')
         raise SystemExit(0 if valid else 1)
     if not args.job:
         parser.error('--job gerekiyor')

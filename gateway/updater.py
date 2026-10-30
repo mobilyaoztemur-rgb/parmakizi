@@ -60,6 +60,15 @@ def public_key_bytes():
     return Path(__file__).with_name('update-key.pem').read_bytes()
 
 
+def public_key_fingerprint(public_key=None):
+    # PEM line endings vary between Windows and Linux. Fingerprint the key's
+    # canonical DER representation, rather than its textual file formatting.
+    key = serialization.load_pem_public_key(public_key or public_key_bytes())
+    if not isinstance(key, Ed25519PublicKey):
+        raise ValueError('Ed25519 doğrulama anahtarı gerekiyor.')
+    return hashlib.sha256(key.public_bytes(serialization.Encoding.DER, serialization.PublicFormat.SubjectPublicKeyInfo)).hexdigest()
+
+
 def verify_manifest(envelope, public_key=None):
     try:
         payload = envelope['payload']

@@ -11,7 +11,7 @@ from unittest.mock import Mock, patch
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
-from gateway.updater import NAMES, UpdateClient, verify_manifest
+from gateway.updater import NAMES, UpdateClient, verify_manifest, public_key_fingerprint
 from gateway.update_helper import apply_update, update_lock
 from gateway.attendance_cache import AttendanceCache
 from gateway.connector import Connector
@@ -33,6 +33,10 @@ def signing_fixture(content=None, version='0.2.0'):
 
 
 class ManifestTests(unittest.TestCase):
+    def test_key_fingerprint_is_identical_on_windows_and_linux(self):
+        public, _, _, _ = signing_fixture()
+        self.assertEqual(public_key_fingerprint(public), public_key_fingerprint(public.replace(b'\n', b'\r\n')))
+
     def test_valid_signature_and_tampering(self):
         public, _, data, sign = signing_fixture()
         envelope = sign(data)
