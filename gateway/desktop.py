@@ -56,10 +56,12 @@ def suggested_subnet():
 
 
 class App:
-    def __init__(self, root, allow_local=False):
+    def __init__(self, root, allow_local=False, start_agent=True):
         self.root, self.allow_local = root, allow_local
         self.client = None
         self.connector = None
+        self.connector_thread = None
+        self.connector_after = None
         self.data = {"devices": [], "gateways": [], "jobs": [], "counts": {}}
         self.executor = ThreadPoolExecutor(max_workers=1)
         self.events = queue.Queue()
@@ -97,6 +99,11 @@ class App:
         self.shell.pack(fill="both", expand=True)
         self.status = tk.StringVar(value="Giriş bekleniyor")
         self.show_login()
+        if start_agent and self.secrets.get('gateway_token') and self.preferences.get('cloud_url') and self.preferences.get('allowed_subnets'):
+            try:
+                self.start_connector()
+            except (ValueError, OSError, KeyError):
+                self.status.set('Kaydedilen bağlantı başlatılamadı; yönetici girişiyle ayarları kontrol edin.')
         self.drain_after = root.after(100, self.drain)
         self.update_after = root.after(1500, lambda: self.check_updates(manual=False))
 
@@ -170,6 +177,8 @@ class App:
             def connected(data):
                 self.client = client
                 if self.preferences.get("cloud_url") != client.base_url:
+                    if self.connector:
+                        self.connector.stop.set()
                     self.secrets = {}
                     self.preferences.pop("gateway_id", None)
                 self.preferences.update(cloud_url=client.base_url, allowed_subnets=allowed)
@@ -198,11 +207,20 @@ class App:
         self.submit(lambda: self.client.request("/api/gateways", {"name": socket.gethostname() + " · Windows"}), paired)
 
     def start_connector(self):
+        self.connector_after = None
+        origin = self.client.base_url if self.client else self.preferences['cloud_url']
+        if self.connector_thread and self.connector_thread.is_alive():
+            if self.connector.config['gateway_token'] == self.secrets['gateway_token'] and self.connector.config['cloud_url'] == origin and not self.connector.stop.is_set():
+                return
+            self.connector.stop.set()
+            self.connector_after = self.root.after(500, self.start_connector)
+            return
         save_settings(self.preferences, self.secrets)
-        scope = hashlib.sha256(self.client.base_url.encode()).hexdigest()[:12]
+        scope = hashlib.sha256(origin.encode()).hexdigest()[:12]
         config = dict(self.preferences, gateway_token=self.secrets["gateway_token"], device_passwords=self.secrets.get("device_passwords", {}), device_settings=self.secrets.get("device_settings", {}), timezone="Europe/Istanbul", attendance_cache=str(config_path().parent / scope / 'attendance-cache.sqlite'))
         self.connector = Connector(config, allow_local=self.allow_local, status=lambda s: self.events.put(("status", s)))
-        threading.Thread(target=self.connector.run, daemon=True, name="LAN connector").start()
+        self.connector_thread = threading.Thread(target=self.connector.run, daemon=True, name="LAN connector")
+        self.connector_thread.start()
 
     def table(self, parent, columns, widths=None):
         container = ttk.Frame(parent)
@@ -486,13 +504,18 @@ class App:
                 return None
         def checked(envelope):
             self.update_checking = False
+            def later():
+                if not self.closed and not self.updating:
+                    self.update_after = self.root.after(6 * 60 * 60 * 1000, lambda: self.check_updates(manual=False))
             if not envelope:
                 if manual:
                     messagebox.showinfo('Güncellemeler', f'{VERSION} sürümü güncel; yayımlanmış daha yeni paket yok.')
+                later()
                 return
             from gateway.updater import verify_manifest
             data = verify_manifest(envelope)
             if not self.client and not self.secrets.get('gateway_token'):
+                later()
                 return messagebox.showinfo('Yeni sürüm var', data['version'] + ' sürümü yayımlandı. İndirmek için buluta giriş yapın.')
             if messagebox.askyesno('Yeni sürüm · ' + data['version'], data.get('notes', '') + '\n\nİmzalı güncelleme indirilip aynı klasöre uygulansın mı? Program yeniden açılır; yerel ayarlar korunur.'):
                 self.updating = True
@@ -501,9 +524,12 @@ class App:
                     self.activate_update(path)
                 def failed(error):
                     self.updating = False
+                    later()
                     self.status.set('Güncelleme uygulanmadı; mevcut sürüm korunuyor.')
                     messagebox.showerror('Güncelleme tamamlanamadı', str(error) if isinstance(error, (ApiError, ValueError, OSError)) else 'Paket indirilemedi; mevcut program korunuyor.')
                 self.submit(lambda: stage_update(client, envelope, sys.executable), staged, on_error=failed)
+            else:
+                later()
         def check_failed(error):
             self.update_checking = False
             messagebox.showerror('Güncelleme kontrolü başarısız', str(error) if isinstance(error, (ApiError, ValueError)) else 'Güncelleme hizmetine ulaşılamadı.')
@@ -617,8 +643,6 @@ class App:
     def logout(self):
         if self.busy:
             return messagebox.showinfo("İşlem sürüyor", "Devam eden bulut isteğinin tamamlanmasını bekleyin.")
-        if self.connector:
-            self.connector.stop.set()
         def done(_):
             self.client = None
             self.status.set("Oturum kapatıldı")
@@ -627,7 +651,7 @@ class App:
 
     def close(self):
         self.closed = True
-        for callback in (self.drain_after, self.refresh_after, self.update_after):
+        for callback in (self.drain_after, self.refresh_after, self.update_after, self.connector_after):
             if callback:
                 self.root.after_cancel(callback)
         if self.connector:
@@ -648,7 +672,7 @@ def main():
         try:
             root = tk.Tk()
             root.withdraw()
-            app = App(root)
+            app = App(root, start_agent=False)
             root.update_idletasks()
             report['window_title'] = root.title()
             endpoint = default_url()

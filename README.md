@@ -112,6 +112,8 @@ ZK adaptörünün `pyzk` bağımlılığı GPLv2 lisanslıdır. İlk paket proje
 
 Yerel korumalı ayarlar `%LOCALAPPDATA%\Parmakizi\config.json` altındadır. DPAPI çözümü aynı Windows kullanıcısını gerektirir. Bağlantı noktasının anahtarı buluttan iptal edilebilir. EXE'nin dışarı doğru HTTPS ve yerel cihaz portlarına erişebilmesi gerekir. Cihaz portlarını internete açmayın.
 
+İlk eşleştirmeden sonra program tekrar açıldığında kaydedilmiş bağlantı anahtarıyla aktarım otomatik başlar; yönetici paneline giriş yapılması gerekmez. Yönetici oturumunu kapatmak yalnızca panel erişimini kapatır. Aktarımı durdurmak için otomatik aktarımı kapatın, bağlantı anahtarını iptal edin veya programı kapatın. Windows başlangıcına otomatik servis kurulmaz; programın açık olması gerekir.
+
 ## Kontroller
 
 ```sh
@@ -126,7 +128,7 @@ Canlı yayın sonrası doğrulama: `python -m scripts.smoke_live`. Ortamdan `ADM
 
 ## Klasör içi güncellemeler ve Cloudflare dağıtımı
 
-**0.1 sürümünde güncelleyici yoktur. 0.2 paketini bir kere elle indirip çıkarın.** Sonraki sürümler uygulamadaki `Güncellemeler` düğmesinden ve açılış kontrolünden bulunur. İndirmek için uygulama oturumu veya bu bilgisayarın geçerli bağlantı anahtarı gerekir. Uygulama yeni sürümü uygulamadan önce onay ister; devam eden cihaz komutu varsa bekler. Programın bulunduğu klasör yazılabilir olmalı ve ana dosya `Parmakizi.exe` adını korumalıdır.
+**0.1 sürümünde güncelleyici yoktur. 0.2 paketini bir kere elle indirip çıkarın.** Sonraki sürümler açılışta, program açıkken altı saatte bir veya `Güncellemeler` düğmesinden kontrol edilir. İndirmek için uygulama oturumu veya bu bilgisayarın geçerli bağlantı anahtarı gerekir. Uygulama yeni sürümü uygulamadan önce onay ister; devam eden cihaz komutu varsa bekler. Programın bulunduğu klasör yazılabilir olmalı ve ana dosya `Parmakizi.exe` adını korumalıdır.
 
 Güncelleme dosyaları Cloudflare Workers Static Assets üzerinden, erişim kontrolünden sonra sunulur. İmzalı sürüm bildirimi D1'de tutulur. Bu hesapta R2 etkin olmadığı için R2 veya ek bir depolama hizmeti gerekmez. Her EXE, Static Assets'in [dosya başına 25 MiB sınırını](https://developers.cloudflare.com/workers/static-assets/platform/limits/) aşmamalıdır.
 
