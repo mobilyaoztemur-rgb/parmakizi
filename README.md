@@ -142,7 +142,7 @@ python scripts/publish_update.py --artifact /path/to/Parmakizi-Windows-x64 --not
 
 Yeni sürüm hazırlarken önce `python scripts/bump_version.py 0.2.1` çalıştırın ve değişiklikleri commit edin. Bu, paket/lockfile/Python sürümünü birlikte günceller; Worker sağlık yanıtı paket sürümünü kullanır. Derleme ve testler aynı sürümü taşımalıdır.
 
-Yayıncı iki EXE'nin özetlerini, Windows test raporlarını ve açık anahtar parmak izini doğrular; mevcut dağıtım dosyalarını korur; yeni dosyaları Cloudflare'a gönderir; CDN üzerinden tekrar indirerek SHA-256 doğrular; yönetici oturumuyla imzalı sürümü yayımlar. Aynı sürüm numarası farklı dosyalarla tekrar yayımlanamaz.
+Yayıncı için ayrıca `pip install -r requirements-publishing.txt` gerekir. Yayıncı iki EXE'nin özetlerini, Windows test raporlarını ve açık anahtar parmak izini doğrular; mevcut dağıtım dosyalarını korur. Büyük aracı istekleri yerine 1 MiB'lık değişmez parçalar normal Cloudflare yükleme oturumuyla gönderilir. Worker, bu parçaları istemciye tek EXE akışı olarak sunar; istemci dosyanın tamamını SHA-256 ve imzalı bildirimle doğrular. Yayıncı da CDN'den tekrar indirerek SHA-256 doğrular ve yönetici oturumuyla imzalı sürümü yayımlar. Aynı sürüm numarası farklı dosyalarla tekrar yayımlanamaz.
 
 GitHub'da otomatik güncelleme yayını için `ENABLE_UPDATE_PUBLISH=true` repository variable ve `production` ortamında `CLOUDFLARE_API_TOKEN`, `ADMIN_PASSWORD` secret'ları ile `CLOUDFLARE_ACCOUNT_ID` variable gerekir. Bu ayarlar Codex ortamındaki bağlamalardan ayrıdır; gizli değerler otomatik olarak GitHub'a kopyalanmaz. Değişken açık değilse derleme/artifact üretimi çalışır, Cloudflare yayın işi atlanır. Bu oturumun güvenli Cloudflare bağlamalarıyla yayın yapmak için ek GitHub secret'ı gerekmez.
 

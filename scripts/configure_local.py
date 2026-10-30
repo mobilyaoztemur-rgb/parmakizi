@@ -39,3 +39,13 @@ for name in ('Parmakizi', 'ParmakiziUpdater'):
     fixture.parent.mkdir(parents=True, exist_ok=True)
     if not fixture.exists():
         fixture.write_bytes(content)
+
+import sys, tempfile
+sys.path.insert(0, str(target.parent))
+from scripts.release_assets import test_chunk_file, stage_file
+for stem in ('Parmakizi', 'ParmakiziUpdater'):
+    content, metadata = test_chunk_file(stem)
+    with tempfile.TemporaryDirectory() as folder:
+        source = Path(folder) / metadata['name']
+        source.write_bytes(content)
+        stage_file(source, metadata, target.parent / 'public')

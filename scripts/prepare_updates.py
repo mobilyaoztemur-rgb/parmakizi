@@ -8,10 +8,12 @@ import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from gateway.client import ApiError, CloudClient
 from gateway.updater import UpdateClient, version_tuple
+from scripts.release_assets import retained, stage_file, clear_test_assets
 
 
 def main():
     root = Path(__file__).resolve().parents[1]
+    clear_test_assets(root / 'public')
     # Remove only exact, known local test fixtures, never arbitrary release files.
     for name in ('Parmakizi', 'ParmakiziUpdater'):
         content = ('MZ-local-test-fixture-' + name).encode()
@@ -37,11 +39,8 @@ def main():
     from gateway.updater import verify_manifest
     data = verify_manifest(envelope)
     destination = root / 'public/updates/files'
-    existing = all((destination / Path(file['path']).name).exists() for file in data['files'])
+    existing = all(retained(file) for file in data['files'])
     if existing:
-        from gateway.updater import check_file
-        for file in data['files']:
-            check_file(destination / Path(file['path']).name, file)
         print('Mevcut imzalı güncelleme dosyaları korundu.')
         return
     password = os.environ.get('ADMIN_PASSWORD')
@@ -53,9 +52,8 @@ def main():
         staging = root / '.wrangler/retained-release' / data['version']
         UpdateClient(origin, auth_client=admin).download(envelope, staging)
         destination.mkdir(parents=True, exist_ok=True)
-        import shutil
         for file in data['files']:
-            shutil.copyfile(staging / file['name'], destination / Path(file['path']).name)
+            stage_file(staging / file['name'], file)
         print('Mevcut güncelleme paketi Cloudflare’dan alındı ve yeni yayına dahil edildi.')
     finally:
         admin.request('/api/auth/logout', {})

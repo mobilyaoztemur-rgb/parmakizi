@@ -15,6 +15,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from gateway.client import CloudClient
 from gateway.updater import MAX_FILE, NAMES, verify_manifest, version_tuple, public_key_fingerprint
 from scripts.prepare_updates import main as retain_updates
+from scripts.release_assets import stage_file
+from scripts.upload_assets import upload_assets
 
 
 def main():
@@ -50,11 +52,8 @@ def main():
         raise SystemExit('Doğru imza anahtarını taşıyan güncelleyici kontrol raporu gerekli.')
     retain_updates()
     for file in files:
-        destination = Path('public') / file['path'].lstrip('/')
-        destination.parent.mkdir(parents=True, exist_ok=True)
-        if destination.exists() and hashlib.sha256(destination.read_bytes()).hexdigest() != file['sha256']:
-            raise SystemExit('Mevcut varlık beklenen dosyayla uyuşmuyor; üzerine yazılmadı.')
-        shutil.copyfile(source / file['name'], destination)
+        stage_file(source / file['name'], file)
+    upload_assets()
     subprocess.run(['npm', 'run', 'build'], check=True)
     subprocess.run(['npx', '--no-install', 'wrangler', 'deploy'], check=True)
     admin = CloudClient(origin)

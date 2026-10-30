@@ -247,6 +247,18 @@ class ApiTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             verify_manifest(envelope)  # Production verification key never trusts the local identity.
 
+    def test_chunked_download_is_one_identical_authenticated_file(self):
+        from scripts.release_assets import test_chunk_file
+        import hashlib
+        content, file = test_chunk_file('Parmakizi')
+        with self.admin.opener.open(BASE + file['path']) as response:
+            received = response.read()
+        self.assertEqual(len(received), len(content))
+        self.assertEqual(hashlib.sha256(received).hexdigest(), file['sha256'])
+        with self.assertRaises(urllib.error.HTTPError) as ctx:
+            urllib.request.urlopen(BASE + file['path'])
+        self.assertEqual(ctx.exception.code, 401)
+
 
 if __name__ == '__main__':
     unittest.main()

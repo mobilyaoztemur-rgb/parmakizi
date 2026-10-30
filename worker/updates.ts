@@ -1,4 +1,5 @@
 export interface UpdateEnv { DB: D1Database; ASSETS: Fetcher; UPDATES_SIGNING_KEY?: string }
+import { releaseAsset } from './release-assets';
 export class UpdateError extends Error { constructor(public status: number, message: string) { super(message); } }
 export function versionCode(version: string) {
   if (!/^(0|[1-9]\d{0,2})\.(0|[1-9]\d{0,2})\.(0|[1-9]\d{0,2})$/.test(version)) throw new UpdateError(400, 'Geçersiz sürüm numarası.');
@@ -19,7 +20,13 @@ export async function publishUpdate(request: Request, env: UpdateEnv, data: Reco
     if (!file || !/^[a-f0-9]{64}$/.test(file.sha256 ?? '') || !Number.isInteger(file.size) || file.size < 1 || file.size > 25 * 1024 * 1024) throw new UpdateError(400, 'Dosya özeti veya boyutu geçersiz.');
     const path = `/updates/files/${name.slice(0, -4)}-${data.version}-${file.sha256.slice(0, 12)}.exe`;
     if (file.path !== path) throw new UpdateError(400, 'Güncelleme dosyası yolu geçersiz.');
-    const asset = await env.ASSETS.fetch(new Request(new URL(path, request.url)));
+    let asset = await releaseAsset(new Request(new URL(path, request.url), { method: 'HEAD' }), env.ASSETS);
+    if (asset.status === 200 && asset.headers.get('content-length')) {
+      if (Number(asset.headers.get('content-length')) !== file.size || (asset.headers.has('x-parmakizi-sha256') && asset.headers.get('x-parmakizi-sha256') !== file.sha256)) throw new UpdateError(409, 'Güncelleme varlığının bilgileri uyuşmuyor.');
+      files.push({ name, path, size: file.size, sha256: file.sha256 });
+      continue;
+    }
+    asset = await releaseAsset(new Request(new URL(path, request.url)), env.ASSETS);
     if (asset.status !== 200 || !asset.body) throw new UpdateError(409, 'Önce doğru dosyaları Cloudflare’a yayımlayın.');
     // Asset HEAD responses do not always expose Content-Length. Count the stream
     // without buffering an executable into the Worker's memory.

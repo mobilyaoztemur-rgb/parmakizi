@@ -2,6 +2,7 @@ import { catalog } from '../shared/catalog';
 import modelInventory from '../shared/model_inventory.json';
 import { latestUpdate, publishUpdate, UpdateError } from './updates';
 import { version as APP_VERSION } from '../package.json';
+import { releaseAsset } from './release-assets';
 
 interface Env { DB: D1Database; ASSETS: Fetcher; ADMIN_PASSWORD: string; SESSION_SECRET: string; UPDATES_SIGNING_KEY?: string }
 type Row = Record<string, any>;
@@ -395,7 +396,7 @@ export default {
       const path = new URL(request.url).pathname;
       if (/^\/updates\/files\/(Parmakizi|ParmakiziUpdater)-\d+\.\d+\.\d+-[a-f0-9]{12}\.exe$/.test(path) && ['GET', 'HEAD'].includes(request.method)) {
         if (request.headers.has('authorization')) await gatewayAuth(request, env); else await session(request, env);
-        response = await env.ASSETS.fetch(request);
+        response = await releaseAsset(request, env.ASSETS);
       } else response = path.startsWith('/api/') ? await api(request, env) : json({ service: 'Parmakizi Cloud API', client: 'Windows masaüstü uygulamasını kullanın.' });
     } catch (error) {
       const expected = error instanceof HttpError || error instanceof UpdateError;

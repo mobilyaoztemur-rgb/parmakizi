@@ -30,6 +30,7 @@ jobs:
           python-version: '3.12'
       - run: npm ci
       - run: pip install -r gateway/requirements.txt
+      - run: pip install -r requirements-publishing.txt
       - name: Check deployment configuration
         shell: bash
         run: |

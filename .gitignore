@@ -11,5 +11,6 @@ gateway/config.json
 gateway/*state.json
 *.log
 public/updates/files/*.exe
+public/updates/chunks/
 build/
 *.spec
