@@ -30,3 +30,12 @@ class AttendanceCache:
     def acknowledge(self, device_id, records):
         with self.db:
             self.db.executemany('INSERT OR IGNORE INTO uploaded VALUES(?,?)', [(device_id, self.digest(r)) for r in records])
+
+    def close(self):
+        self.db.close()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *_):
+        self.close()

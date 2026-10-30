@@ -10,13 +10,14 @@ import unittest
 
 from gateway.update_helper import apply_update, wait_for_parent
 from gateway.tests.test_updates import signing_fixture
+from gateway.version import VERSION
 
 
 @unittest.skipUnless(os.name == 'nt' and os.environ.get('TEST_FROZEN_EXE'), 'Requires packaged Windows application')
 class FrozenUpdateTests(unittest.TestCase):
     def test_replacement_boots_real_exe_and_acknowledges_version(self):
         binaries = {'Parmakizi.exe': Path(os.environ['TEST_FROZEN_EXE']).read_bytes(), 'ParmakiziUpdater.exe': Path(os.environ['TEST_FROZEN_UPDATER']).read_bytes()}
-        public, _, data, sign = signing_fixture(binaries)
+        public, _, data, sign = signing_fixture(binaries, version=VERSION)
         child_pid = None
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)

@@ -1,6 +1,7 @@
 import { catalog } from '../shared/catalog';
 import modelInventory from '../shared/model_inventory.json';
 import { latestUpdate, publishUpdate, UpdateError } from './updates';
+import { version as APP_VERSION } from '../package.json';
 
 interface Env { DB: D1Database; ASSETS: Fetcher; ADMIN_PASSWORD: string; SESSION_SECRET: string; UPDATES_SIGNING_KEY?: string }
 type Row = Record<string, any>;
@@ -184,7 +185,7 @@ async function api(request: Request, env: Env): Promise<Response> {
   const url = new URL(request.url), path = url.pathname, method = request.method;
   if (path === '/api/health' && method === 'GET') {
     await env.DB.prepare('SELECT 1 FROM gateways LIMIT 1').first();
-    return json({ ok: true, service: 'parmakizi', version: '0.2.0' });
+    return json({ ok: true, service: 'parmakizi', version: APP_VERSION });
   }
   if (path === '/api/updates/latest' && method === 'GET') return latestUpdate(env);
   if (!env.ADMIN_PASSWORD || env.ADMIN_PASSWORD.length < 12 || !env.SESSION_SECRET || env.SESSION_SECRET.length < 32) throw new HttpError(503, 'Yönetici parolası ve oturum anahtarı yapılandırılmalı.');

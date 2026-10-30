@@ -229,6 +229,13 @@ class Connector:
         self.status("Tamamlandı: " + job["type"])
 
     def run(self, once=False):
+        try:
+            return self._run(once)
+        finally:
+            if not once:
+                self.cache.close()
+
+    def _run(self, once=False):
         delay = 3
         while not self.stop.is_set():
             try:

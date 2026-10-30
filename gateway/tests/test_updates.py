@@ -17,15 +17,15 @@ from gateway.attendance_cache import AttendanceCache
 from gateway.connector import Connector
 
 
-def signing_fixture(content=None):
+def signing_fixture(content=None, version='0.2.0'):
     key = Ed25519PrivateKey.generate()
     public = key.public_key().public_bytes(serialization.Encoding.PEM, serialization.PublicFormat.SubjectPublicKeyInfo)
     content = content or {name: ('MZ-new-' + name).encode() for name in NAMES}
     files = []
     for name in NAMES:
         digest = hashlib.sha256(content[name]).hexdigest()
-        files.append({'name': name, 'path': f'/updates/files/{name[:-4]}-0.2.0-{digest[:12]}.exe', 'sha256': digest, 'size': len(content[name])})
-    data = {'version': '0.2.0', 'notes': 'Test', 'publishedAt': '2026-10-30T00:00:00Z', 'files': files}
+        files.append({'name': name, 'path': f'/updates/files/{name[:-4]}-{version}-{digest[:12]}.exe', 'sha256': digest, 'size': len(content[name])})
+    data = {'version': version, 'notes': 'Test', 'publishedAt': '2026-10-30T00:00:00Z', 'files': files}
     def sign(data):
         payload = json.dumps(data, separators=(',', ':'))
         return {'payload': payload, 'signature': base64.b64encode(key.sign(payload.encode())).decode()}
@@ -137,11 +137,12 @@ class SyncCacheTests(unittest.TestCase):
         row = {'userId': '1', 'recordedAt': '2026-10-30T09:00:00+03:00', 'status': 1, 'punch': 0}
         with tempfile.TemporaryDirectory() as folder:
             path = Path(folder) / 'cache.sqlite'
-            cache = AttendanceCache(path)
-            self.assertEqual(cache.unseen('d', [row]), [row])
-            cache.acknowledge('d', [row])
-            self.assertEqual(AttendanceCache(path).unseen('d', [row]), [])
-            self.assertEqual(cache.unseen('other-device', [row]), [row])
+            with AttendanceCache(path) as cache:
+                self.assertEqual(cache.unseen('d', [row]), [row])
+                cache.acknowledge('d', [row])
+            with AttendanceCache(path) as restored:
+                self.assertEqual(restored.unseen('d', [row]), [])
+                self.assertEqual(restored.unseen('other-device', [row]), [row])
 
     def test_updater_cannot_interrupt_a_device_command(self):
         connector = Connector({'cloud_url': 'https://example.com', 'gateway_token': 'test', 'allowed_subnets': ['192.168.1.0/24']})

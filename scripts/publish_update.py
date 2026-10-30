@@ -24,6 +24,7 @@ def main():
     args = parser.parse_args()
     version = json.loads(Path('package.json').read_text())['version']
     version_tuple(version)
+    origin = json.loads(Path('gateway/defaults.json').read_text())['cloud_url']
     source = Path(args.artifact)
     password = os.environ.get('ADMIN_PASSWORD')
     if not password:
@@ -42,7 +43,7 @@ def main():
         files.append({'name': name, 'path': target, 'sha256': digest, 'size': len(content)})
     report = json.loads((source / 'self-test.json').read_text(encoding='utf-8'))
     fingerprint = hashlib.sha256(Path('gateway/update-key.pem').read_bytes()).hexdigest()
-    if report.get('ok') is not True or report.get('windows_dpapi') is not True or report.get('version') != version or report.get('public_key_sha256') != fingerprint:
+    if report.get('ok') is not True or report.get('windows_dpapi') is not True or report.get('version') != version or report.get('public_key_sha256') != fingerprint or report.get('default_endpoint') != origin:
         raise SystemExit('Başarılı Windows EXE kontrol raporu gerekli.')
     helper_report = json.loads((source / 'helper-self-test.json').read_text(encoding='utf-8'))
     if helper_report.get('ok') is not True or helper_report.get('version') != version or helper_report.get('public_key_sha256') != fingerprint:
@@ -56,7 +57,6 @@ def main():
         shutil.copyfile(source / file['name'], destination)
     subprocess.run(['npm', 'run', 'build'], check=True)
     subprocess.run(['npx', '--no-install', 'wrangler', 'deploy'], check=True)
-    origin = json.loads(Path('gateway/defaults.json').read_text())['cloud_url']
     admin = CloudClient(origin)
     admin.request('/api/auth/login', {'password': password})
     try:
